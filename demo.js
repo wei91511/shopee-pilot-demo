@@ -884,3 +884,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// ===== 橫向提示 =====
+(function () {
+  const SESSION_KEY = 'orientDismissed';
+
+  function isPortraitMobile() {
+    return window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+  }
+
+  function init() {
+    if (sessionStorage.getItem(SESSION_KEY)) return;
+
+    const overlay = document.getElementById('orientOverlay');
+    const btn = document.getElementById('orientDismiss');
+    if (!overlay || !btn) return;
+
+    if (isPortraitMobile()) overlay.classList.add('show');
+
+    function onResize() {
+      if (!isPortraitMobile()) overlay.classList.remove('show');
+    }
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+
+    btn.addEventListener('click', function () {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      overlay.classList.remove('show');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

@@ -469,6 +469,60 @@ body {
 @keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 
 /* ============================
+   橫向提示 Overlay
+   ============================ */
+.orient-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.9);
+  align-items: center; justify-content: center;
+}
+.orient-overlay.show { display: flex; }
+.orient-box {
+  text-align: center;
+  padding: 36px 32px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  border: 1px solid rgba(238,77,45,0.4);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  max-width: 300px;
+  width: calc(100% - 40px);
+}
+.orient-icon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 18px;
+  animation: phoneRotate 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes phoneRotate {
+  0%, 25%  { transform: rotate(0deg); }
+  55%, 80% { transform: rotate(90deg); }
+  100%     { transform: rotate(0deg); }
+}
+.orient-msg {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.75;
+  margin-bottom: 22px;
+}
+.orient-msg strong { color: var(--shopee); }
+.orient-btn {
+  padding: 11px 28px;
+  background: var(--shopee);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s;
+  width: 100%;
+}
+.orient-btn:hover { background: var(--shopee-dk); }
+
+/* ============================
    響應式 — 768px（手機）
    ============================ */
 @media (max-width: 768px) {
