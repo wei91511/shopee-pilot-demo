@@ -617,3 +617,81 @@ body {
   .step-bar { padding: 14px 16px; }
   .step-bar-inner { font-size: 15px; line-height: 1.5; }
 }
+
+/* ============================
+   Portrait 手機：雙面板同時可見
+   header ~102px + tabs ~44px + top-pad ~10px ≈ 156px
+   ============================ */
+@media (max-width: 767px) and (orientation: portrait) {
+
+  /* Demo wrap 固定高度，讓內部面板填滿 */
+  .demo-wrap {
+    height: calc(100vh - 156px);
+    height: calc(100svh - 156px); /* 現代 mobile 去掉 browser chrome */
+    padding: 6px 8px;
+    overflow: hidden;
+  }
+
+  /* ftab-content 填滿 demo-wrap */
+  .ftab-content.active {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* tab-controls（播放/重置按鈕）不縮放 */
+  .tab-controls { flex-shrink: 0; margin-bottom: 6px; }
+
+  /* demo-columns：改 flex 垂直，撐滿剩餘高度 */
+  .demo-columns {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* 兩個面板各佔一半，各自獨立捲動 */
+  .demo-columns > * {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* SP frame 內部讓 sp-body 撐高 */
+  .sp-frame {
+    display: flex;
+    flex-direction: column;
+  }
+  .sp-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: none !important;
+  }
+
+  /* 蝦皮後台：body 可獨立捲動 */
+  .shopee-frame { display: flex; flex-direction: column; }
+  .shopee-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+/* ============================
+   Landscape 手機：左右並排
+   ============================ */
+@media (max-width: 767px) and (orientation: landscape) {
+
+  /* 覆蓋 880px 的 grid-template-columns: 1fr */
+  .demo-columns {
+    grid-template-columns: 300px 1fr !important;
+    gap: 8px;
+  }
+  .sp-frame-fixed { max-width: 100%; }
+  /* SP body 限制高度，讓面板不會超出畫面 */
+  .sp-body { max-height: calc(100vh - 170px) !important; }
+  .shopee-body { max-height: calc(100vh - 100px); overflow-y: auto; }
+}
