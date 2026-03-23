@@ -1,4 +1,4 @@
-// 運營工具箱 Demo v3.2 — 連播 + 字幕 + 緊急停止 + 響應式
+// 運營工具箱 Demo v3.3 — 聚焦引導 + 節奏放慢 + 預算重置演示
 
 // ========================
 //  資料
@@ -9,6 +9,9 @@ const AD_DATA = [
   { id: 'C', name: '快充線三件組',   budget: 85,  spend: 77,  roas: 5.1, ctr: 1.8 },
   { id: 'D', name: '螢幕保護貼',     budget: 90,  spend: 88,  roas: 5.5, ctr: 3.2 },
 ];
+
+// 重置預算目標值：最佳廣告 170，其餘 85
+const RESET_BUDGETS = { A: 170, B: 85, C: 85, D: 85 };
 
 const FLASH_ITEMS = [
   { idx: 1, name: '藍芽耳機/黑色', orig: 14 },
@@ -73,8 +76,8 @@ function setStep(text) {
   }
 }
 
-// 連續字幕展示
-async function showSubtitles(texts, duration = 2200) {
+// 連續字幕展示（預設停留 4500ms，讀完再切）
+async function showSubtitles(texts, duration = 4500) {
   for (const text of texts) {
     setStep(text);
     await safeDelay(duration);
@@ -91,7 +94,7 @@ function highlight(el) {
   el.classList.remove('highlight-pulse');
   void el.offsetWidth;
   el.classList.add('highlight-pulse');
-  setTimeout(() => el.classList.remove('highlight-pulse'), 1700);
+  setTimeout(() => el.classList.remove('highlight-pulse'), 2500);
 }
 
 function addLog(action, detail) {
@@ -135,6 +138,40 @@ async function genCodeAnimation(el) {
 }
 
 // ========================
+//  Spotlight 聚焦引導
+// ========================
+function _getFrames() {
+  const active = document.querySelector('.ftab-content.active');
+  if (!active) return { sp: null, shopee: null };
+  return {
+    sp: active.querySelector('.sp-frame'),
+    shopee: active.querySelector('.shopee-frame'),
+  };
+}
+
+// 聚焦單一面板（另一側變暗）
+function spotlight(el) {
+  document.body.classList.add('spotlight-active');
+  document.querySelectorAll('.spotlight-target').forEach(e => e.classList.remove('spotlight-target'));
+  if (el) el.classList.add('spotlight-target');
+}
+
+// 兩側同時亮起（執行時）
+function spotlightBoth() {
+  document.body.classList.add('spotlight-active');
+  document.querySelectorAll('.spotlight-target').forEach(e => e.classList.remove('spotlight-target'));
+  const { sp, shopee } = _getFrames();
+  if (sp) sp.classList.add('spotlight-target');
+  if (shopee) shopee.classList.add('spotlight-target');
+}
+
+// 關閉 spotlight（恢復正常）
+function spotlightOff() {
+  document.body.classList.remove('spotlight-active');
+  document.querySelectorAll('.spotlight-target').forEach(e => e.classList.remove('spotlight-target'));
+}
+
+// ========================
 //  狀態
 // ========================
 let isPlaying = false;
@@ -173,12 +210,12 @@ async function runScan() {
       p = Math.min(p + 3, target);
       if (fill) fill.style.width = p + '%';
       if (pct) pct.textContent = p + '%';
-      await delay(25);
+      await delay(40);   // 25 → 40
     }
-    if (p < 100) await delay(280);
+    if (p < 100) await delay(500);  // 280 → 500
   }
 
-  await delay(300);
+  await delay(500);  // 300 → 500
   if (progress) progress.classList.add('hidden');
   if (fill) fill.style.width = '0%';
   if (pct) pct.textContent = '';
@@ -235,7 +272,7 @@ async function runExecute() {
     const row = document.querySelector(`tr[data-id="${ad.id}"]`);
     if (row) {
       row.classList.add('s-adjusting');
-      await delay(380);
+      await delay(800);   // 380 → 800
       const cell = row.querySelector('.s-budget');
       if (cell) {
         cell.textContent = `$${ad.newBudget}`;
@@ -245,10 +282,10 @@ async function runExecute() {
       row.classList.remove('s-adjusting');
       row.classList.add('s-done');
     }
-    await delay(280);
+    await delay(500);   // 280 → 500
   }
 
-  await delay(300);
+  await delay(500);  // 300 → 500
   if (progress) progress.classList.add('hidden');
   if (fill) fill.style.width = '0%';
 
@@ -277,12 +314,73 @@ async function runExecute() {
     lastRun.textContent = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${h >= 12 ? '下午' : '上午'}${h > 12 ? h-12 : h}:${String(now.getMinutes()).padStart(2,'0')}`;
   }
 
-  await delay(500);
+  await delay(800);   // 500 → 800
   showTelegramNotification(adjs);
 
   if (scanBtn) scanBtn.disabled = false;
   if (executeBtn) executeBtn.disabled = true;
   scanDone = false;
+}
+
+// ========================
+//  廣告 — 預算重置
+// ========================
+async function runResetBudget() {
+  const progress = document.getElementById('spProgress');
+  const fill = document.getElementById('spProgressFill');
+  const label = document.getElementById('spProgressLabel');
+  const resultPanel = document.getElementById('executeResultPanel');
+
+  if (progress) progress.classList.remove('hidden');
+  if (resultPanel) { resultPanel.classList.add('hidden'); resultPanel.innerHTML = ''; }
+
+  const entries = Object.entries(RESET_BUDGETS);
+  for (let i = 0; i < entries.length; i++) {
+    const [id, budget] = entries[i];
+    const pct = Math.round(((i + 1) / entries.length) * 100);
+    const adName = AD_DATA.find(a => a.id === id)?.name || id;
+    if (label) label.textContent = `重置 ${adName}...`;
+    if (fill) fill.style.width = pct + '%';
+
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    if (row) {
+      row.classList.remove('s-done');
+      row.classList.add('s-adjusting');
+      await safeDelay(600);
+      const cell = row.querySelector('.s-budget');
+      if (cell) {
+        cell.textContent = `$${budget}`;
+        cell.classList.add('updated');
+        setTimeout(() => cell.classList.remove('updated'), 800);
+      }
+      row.classList.remove('s-adjusting');
+    }
+    await safeDelay(400);
+  }
+
+  await delay(400);
+  if (progress) progress.classList.add('hidden');
+  if (fill) fill.style.width = '0%';
+
+  if (resultPanel) {
+    resultPanel.className = 'sp-result-panel info';
+    resultPanel.innerHTML = `
+      <div class="sp-result-item">
+        <span>✅</span>
+        <span class="sp-r-name">最佳廣告：藍芽耳機旗艦款</span>
+        <span class="sp-r-rule">維持 $170</span>
+      </div>
+      <div class="sp-result-item">
+        <span>🔄</span>
+        <span class="sp-r-name">其他 3 個廣告</span>
+        <span class="sp-r-rule">重置為 $85</span>
+      </div>
+      <div class="sp-result-summary">✅ 已重置 ${entries.length} 個廣告預算</div>
+    `;
+    resultPanel.classList.remove('hidden');
+  }
+
+  addLog('重置', `${entries.length} 個廣告預算歸零`);
 }
 
 // ========================
@@ -314,23 +412,37 @@ ${lines}
 //  廣告 Tab — 核心動畫
 // ========================
 async function _runAdDemoAnimation() {
+  const { sp: spFrame, shopee: shopeeFrame } = _getFrames();
+
+  spotlightOff();
   switchFtab('ad');
   switchSpTab('ad');
-  await safeDelay(400);
+  await safeDelay(800);
 
-  // === 功能簡介字幕 ===
+  // === 功能簡介字幕（全畫面正常顯示）===
   await showSubtitles([
     '排程自動調整 — 最具殺傷力的便利功能',
     '完全解放電腦座位前的經營者',
     '定時拿手機檢視報告，即可輕鬆控制預算',
-  ], 2200);
+  ], 4500);
 
-  // === 操作演示 ===
-  setStep('⏰ 排程啟用後，每小時 0分/30分 自動執行廣告調整');
+  // === 調整規則 ===
+  setStep('⚙️ 確認調整規則與觸發條件...');
+  spotlight(spFrame);
+  const rulesCard = document.getElementById('spRulesCard');
+  if (rulesCard) {
+    rulesCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    await safeDelay(600);
+    highlight(rulesCard);
+  }
+  await safeDelay(3500);
+
+  // === 排程設定 ===
+  setStep('⏰ 排程時間到，系統自動開始執行！');
   const schedCard = document.getElementById('spScheduleCard');
   if (schedCard) {
     schedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    await safeDelay(500);
+    await safeDelay(600);
     highlight(schedCard);
   }
 
@@ -339,52 +451,85 @@ async function _runAdDemoAnimation() {
   if (countdown) countdown.classList.remove('hidden');
   for (let s = 3; s >= 0; s--) {
     if (timeEl) timeEl.textContent = `00:0${s}`;
-    await safeDelay(s === 3 ? 800 : 700);
+    await safeDelay(s === 3 ? 1000 : 900);
   }
   if (countdown) countdown.classList.add('hidden');
-  await safeDelay(300);
-
-  const scanBtnEl = document.getElementById('scanBtn');
-  if (scanBtnEl) scanBtnEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  await safeDelay(500);
-
-  setStep('🔍 排程時間到！自動掃描廣告數據...');
-  await runScan();
   await safeDelay(600);
 
+  // === 掃描 ===
+  setStep('🔍 自動掃描廣告數據，計算調整方案...');
+  spotlight(spFrame);
+  const scanBtnEl = document.getElementById('scanBtn');
+  if (scanBtnEl) scanBtnEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  await safeDelay(800);
+
+  await runScan();
+  await safeDelay(1500);
+
+  // === 執行調整 ===
   const stopBtn = document.getElementById('stopBtn');
   if (stopBtn) stopBtn.classList.remove('hidden');
-  setStep('⚡ 執行調整中 — 執行中可隨時按下「緊急停止」中斷操作');
+  spotlightBoth();
+  setStep('⚡ 執行調整中 — 執行時可隨時按「緊急停止」中斷操作');
   highlight(document.getElementById('executeBtn'));
-  await safeDelay(1600);
+  await safeDelay(2500);
 
   await runExecute();
   if (stopBtn) stopBtn.classList.add('hidden');
-  await safeDelay(600);
+  await safeDelay(1500);
 
-  setStep('✅ 廣告調整完成！Telegram 推播報告已發送');
+  // === TG 推播 ===
+  spotlightOff();
+  setStep('📱 Telegram 推播報告已發送！');
+  const tgWrap = document.getElementById('tgWrap');
+  if (tgWrap) tgWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  await safeDelay(4500);
+
+  // === 預算重置演示 ===
+  setStep('🔄 預算重置 — 一鍵將廣告預算歸零，隔天重新開始');
+  spotlight(spFrame);
+  const adResetBtn = document.getElementById('adResetBtn');
+  if (adResetBtn) {
+    adResetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    await safeDelay(600);
+    highlight(adResetBtn);
+  }
   await safeDelay(2500);
+
+  setStep('⚙️ 系統自動選出最佳廣告，其餘重置為基準預算...');
+  spotlightBoth();
+  await runResetBudget();
+  await safeDelay(1500);
+
+  spotlightOff();
+  setStep('📅 適合每日固定預算的賣家 — 隔天排程自動重新調整');
+  await safeDelay(4500);
 }
 
 // ========================
 //  限時特賣 Tab — 核心動畫
 // ========================
 async function _runFlashDemoAnimation() {
+  const { sp: spFrame, shopee: shopeeFrame } = _getFrames();
+
   // === 功能簡介字幕 ===
   await showSubtitles([
     '快速設定活動庫存 — 多檔次輪流的利器',
     '讓賣家快速完成銷售計畫布局',
-  ], 2200);
+  ], 4500);
 
-  // === 操作演示 ===
+  // === 選擇模式 ===
   setStep('🏷️ 選擇庫存設定方式 — 活動庫存 = 現有庫存 ÷ 2');
+  spotlight(spFrame);
   highlight(document.getElementById('flashModeCard'));
-  await safeDelay(2000);
+  await safeDelay(3000);
 
+  // === 預覽 ===
   setStep('👆 點擊「預覽變更」查看修改前後對比');
   const previewBtn = document.getElementById('flashPreviewBtn');
+  spotlight(spFrame);
   highlight(previewBtn);
-  await safeDelay(1000);
+  await safeDelay(2000);
 
   setStep('📋 預覽結果 — 原庫存 ÷ 2，確認無誤後執行');
   const resultPanel = document.getElementById('flashResultPanel');
@@ -405,17 +550,21 @@ async function _runFlashDemoAnimation() {
   }
   const execBtn = document.getElementById('flashExecuteBtn');
   if (execBtn) execBtn.disabled = false;
-  await safeDelay(2000);
+  await safeDelay(3000);
 
+  // === 執行 ===
   setStep('🚀 確認後點擊「執行修改」，蝦皮後台庫存即時更新');
+  spotlight(spFrame);
   highlight(execBtn);
-  await safeDelay(900);
+  await safeDelay(1800);
 
   setStep('⚙️ 逐一更新活動庫存...');
   const progress = document.getElementById('flashProgress');
   const fill = document.getElementById('flashProgressFill');
   const label = document.getElementById('flashProgressLabel');
   if (progress) progress.classList.remove('hidden');
+
+  spotlightBoth();
 
   for (let i = 0; i < FLASH_ITEMS.length; i++) {
     const item = FLASH_ITEMS[i];
@@ -426,14 +575,14 @@ async function _runFlashDemoAnimation() {
     const row = document.getElementById(`f2-row-${item.idx}`);
     const stockCell = document.getElementById(`f2-stock-${item.idx}`);
     if (row) row.classList.add('s-adjusting');
-    await safeDelay(600);
+    await safeDelay(1000);   // 600 → 1000
     if (stockCell) {
       stockCell.textContent = Math.ceil(item.orig / 2);
       stockCell.classList.add('updated');
       setTimeout(() => stockCell.classList.remove('updated'), 800);
     }
     if (row) { row.classList.remove('s-adjusting'); row.classList.add('s-done'); }
-    await safeDelay(350);
+    await safeDelay(600);   // 350 → 600
   }
 
   if (progress) progress.classList.add('hidden');
@@ -454,81 +603,96 @@ async function _runFlashDemoAnimation() {
       </div>
     `).join('') + `<div class="sp-result-summary">✅ 成功修改 ${FLASH_ITEMS.length} 個商品庫存</div>`;
   }
-  await safeDelay(2500);
+  spotlightOff();
+  await safeDelay(5000);   // 2500 → 5000
 }
 
 // ========================
 //  優惠券 Tab — 核心動畫
 // ========================
 async function _runVoucherDemoAnimation() {
+  const { sp: spFrame, shopee: shopeeFrame } = _getFrames();
+
   // === 功能簡介字幕 ===
   await showSubtitles([
     '快速建立優惠券 — 大幅縮短操作時間',
     '縮短優惠券效期，促使買家快速決定下單',
-  ], 2200);
+  ], 4500);
 
-  // === 操作演示 ===
+  // === 選擇範本 ===
   setStep('🎫 選擇優惠券範本 — 一鍵套用折扣設定');
+  spotlight(spFrame);
   const tplItems = document.querySelectorAll('#vTplList .sp-template-item');
   const tplItem = tplItems[VOUCHER_DEMO.tplIdx];
   if (tplItem) {
     tplItem.classList.add('v-tpl-active');
     tplItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  await safeDelay(1800);
+  await safeDelay(2800);   // 1800 → 2800
 
+  // === 套用 ===
   setStep('✅ 套用範本「' + VOUCHER_DEMO.name + '」— 點擊 ✓ 確認');
   if (tplItem) {
     const applyBtn = tplItem.querySelector('.sp-t-apply');
     if (applyBtn) highlight(applyBtn);
   }
-  await safeDelay(1000);
+  await safeDelay(2000);   // 1000 → 2000
 
+  // === 填入日期 ===
   setStep('📅 自動填入優惠券使用時間');
+  spotlight(spFrame);
   const vStart = document.getElementById('vStartDate');
   const vEnd = document.getElementById('vEndDate');
   if (vStart) {
     vStart.value = '';
     vStart.classList.add('input-flash');
-    await safeDelay(200);
+    await safeDelay(300);
     vStart.value = '202604010000';
     setTimeout(() => vStart.classList.remove('input-flash'), 700);
   }
-  await safeDelay(450);
+  await safeDelay(800);
   if (vEnd) {
     vEnd.value = '';
     vEnd.classList.add('input-flash');
-    await safeDelay(200);
+    await safeDelay(300);
     vEnd.value = '202604300000';
     setTimeout(() => vEnd.classList.remove('input-flash'), 700);
   }
-  await safeDelay(1200);
+  await safeDelay(1800);   // 1200 → 1800
 
+  // === 生成代碼 ===
   setStep('🎲 自動生成隨機優惠代碼（5碼英數字）');
+  spotlight(spFrame);
   const codeDisplay = document.getElementById('vCodeDisplay');
   let generatedCode = 'M3X9K';
   if (codeDisplay) generatedCode = await genCodeAnimation(codeDisplay);
-  await safeDelay(1000);
+  await safeDelay(2000);   // 1000 → 2000
 
+  // === 快速填入 ===
   setStep('🚀 點擊「快速填入」— 自動填入蝦皮後台所有欄位');
+  spotlight(spFrame);
   const fillBtn = document.getElementById('vFillBtn');
   if (fillBtn) highlight(fillBtn);
-  await safeDelay(900);
+  await safeDelay(1800);   // 900 → 1800
 
+  // === 蝦皮後台逐欄填入 ===
   setStep('✍️ 蝦皮後台表單逐欄自動填入...');
+  spotlightBoth();
   await typeInto(document.getElementById('v2-name'), VOUCHER_DEMO.name, 60);
-  await delay(250);
+  await delay(600);   // 250 → 600
   await typeInto(document.getElementById('v2-code'), generatedCode, 90);
-  await delay(250);
+  await delay(600);
   await typeInto(document.getElementById('v2-period'), '2026/04/01 00:00 至 2026/04/30 00:00', 28);
-  await delay(250);
+  await delay(600);
   await typeInto(document.getElementById('v2-discount'), `NT$${VOUCHER_DEMO.discount}`, 70);
-  await delay(250);
+  await delay(600);
   await typeInto(document.getElementById('v2-minimum'), `NT$${VOUCHER_DEMO.min}`, 70);
-  await safeDelay(1500);
+  await safeDelay(3000);   // 1500 → 3000
 
+  // === 完成 ===
+  spotlightOff();
   setStep('✅ 優惠券資料已填入完畢 — 確認後點擊送出即可');
-  await safeDelay(2500);
+  await safeDelay(5000);   // 2500 → 5000
 }
 
 // ========================
@@ -536,6 +700,7 @@ async function _runVoucherDemoAnimation() {
 // ========================
 function resetAdDemo() {
   scanDone = false;
+  spotlightOff();
 
   const scanBtn = document.getElementById('scanBtn');
   const executeBtn = document.getElementById('executeBtn');
@@ -582,6 +747,7 @@ function resetDemo() {
   isPlaying = false;
   stopRequested = false;
   clearTimeout(_stepTimer);
+  spotlightOff();
 
   const btn = document.getElementById('autoPlayBtn');
   if (btn) {
@@ -610,7 +776,6 @@ async function autoPlay() {
   document.getElementById('autoPlayIcon').textContent = '⏹';
   document.getElementById('autoPlayLabel').textContent = '停止';
 
-  // 停用 per-tab 播放按鈕
   ['playFlashSaleBtn', 'playVoucherBtn'].forEach(id => {
     const b = document.getElementById(id);
     if (b) b.disabled = true;
@@ -620,42 +785,43 @@ async function autoPlay() {
     // ==== Tab 1: 廣告管理 ====
     resetAdDemo();
     await _runAdDemoAnimation();
-    await safeDelay(800);
+    await safeDelay(1500);   // 800 → 1500
 
     // ==== Tab 2: 限時特賣 ====
     resetFlashSaleDemo();
     switchFtab('flash');
-    await safeDelay(600);
+    await safeDelay(1000);   // 600 → 1000
     await _runFlashDemoAnimation();
-    await safeDelay(800);
+    await safeDelay(1500);
 
     // ==== Tab 3: 優惠券 ====
     resetVoucherDemo();
     switchFtab('voucher');
-    await safeDelay(600);
+    await safeDelay(1000);
     await _runVoucherDemoAnimation();
-    await safeDelay(800);
+    await safeDelay(1500);
 
     // ==== 結尾字幕 ====
     await showSubtitles([
       '半自動 / 全自動，減輕繁瑣操作的負擔',
       '還給經營者生活品質 ✨',
-    ], 2500);
+    ], 4500);
 
   } catch(e) {
     if (e.message !== 'STOP') throw e;
     setStep('');
+    spotlightOff();
     resetAdDemo();
     resetFlashSaleDemo();
     resetVoucherDemo();
   } finally {
     isPlaying = false;
     stopRequested = false;
+    spotlightOff();
     btn.classList.remove('playing');
     document.getElementById('autoPlayIcon').textContent = '▶';
     document.getElementById('autoPlayLabel').textContent = '再播一次';
 
-    // 恢復 per-tab 按鈕
     ['playFlashSaleBtn', 'playVoucherBtn'].forEach(id => {
       const b = document.getElementById(id);
       if (b) b.disabled = false;
@@ -689,6 +855,7 @@ async function playFlashSaleDemo() {
   } finally {
     flashPlaying = false;
     stopRequested = false;
+    spotlightOff();
     if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶ 再播一次'; }
   }
 }
@@ -698,6 +865,7 @@ async function playFlashSaleDemo() {
 // ========================
 function resetFlashSaleDemo() {
   flashPlaying = false;
+  spotlightOff();
 
   const playBtn = document.getElementById('playFlashSaleBtn');
   if (playBtn && !isPlaying) { playBtn.disabled = false; playBtn.textContent = '▶ 播放演示'; }
@@ -744,6 +912,7 @@ async function playVoucherDemo() {
   } finally {
     voucherPlaying = false;
     stopRequested = false;
+    spotlightOff();
     if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶ 再播一次'; }
   }
 }
@@ -753,6 +922,7 @@ async function playVoucherDemo() {
 // ========================
 function resetVoucherDemo() {
   voucherPlaying = false;
+  spotlightOff();
 
   const playBtn = document.getElementById('playVoucherBtn');
   if (playBtn && !isPlaying) { playBtn.disabled = false; playBtn.textContent = '▶ 播放演示'; }
@@ -797,8 +967,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('spage-ad').classList.add('active');
   document.getElementById('autoPlayLabel').textContent = '三Tab連播';
 
+  // ── 開場高亮（引導用戶點播放）──
+  const autoPlayBtn = document.getElementById('autoPlayBtn');
+  autoPlayBtn.classList.add('ctrl-btn-attention');
+
   // ── 頂部按鈕（播放 / 停止）──
-  document.getElementById('autoPlayBtn').addEventListener('click', () => {
+  autoPlayBtn.addEventListener('click', () => {
+    autoPlayBtn.classList.remove('ctrl-btn-attention');
     if (isPlaying) {
       stopDemo();
     } else {
@@ -862,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.ftab').forEach(btn => {
     btn.addEventListener('click', () => {
       switchFtab(btn.dataset.ftab);
-      if (!isPlaying) setStep('');
+      if (!isPlaying) { setStep(''); spotlightOff(); }
     });
   });
 

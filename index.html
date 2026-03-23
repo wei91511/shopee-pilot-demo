@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=1300">
   <title>運營工具箱 Demo</title>
   <link rel="stylesheet" href="demo.css">
 </head>
@@ -168,7 +168,7 @@
               </div>
 
               <!-- 其他動作 -->
-              <button class="sp-action-btn sp-outline sp-full" style="margin-bottom:6px;">🔄 重置預算</button>
+              <button id="adResetBtn" class="sp-action-btn sp-outline sp-full" style="margin-bottom:6px;">🔄 重置預算</button>
               <button class="sp-action-btn sp-secondary sp-full" style="margin-bottom:6px;">📊 分析健康度</button>
               <button class="sp-action-btn sp-outline sp-full" style="margin-bottom:8px;">📤 測試推播</button>
 
@@ -573,7 +573,7 @@
       </div><!-- /demo-columns -->
 
       <!-- TG 通知 -->
-      <div class="tg-wrap">
+      <div class="tg-wrap" id="tgWrap">
         <div class="tg-card">
           <div class="tg-card-header">
             <span>📱 Telegram 推播模擬</span>
