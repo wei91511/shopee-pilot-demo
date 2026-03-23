@@ -124,12 +124,6 @@ body {
   border-color: var(--shopee); color: var(--shopee);
   animation: btnAttention 1.2s ease-out infinite;
 }
-/* 自動播放中狀態：顯示「⏸ 暫停」 */
-.step-nav-btn.auto-playing {
-  border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.65);
-  font-size: 13px; font-weight: 500; letter-spacing: 0;
-}
-.step-nav-btn.auto-playing:hover { border-color: #f59e0b; color: #f59e0b; background: rgba(245,158,11,0.08); }
 
 /* ===== Generic hidden ===== */
 .hidden { display: none !important; }

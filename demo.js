@@ -61,25 +61,31 @@ function _hideStepBtns() {
   document.getElementById('stepPrevBtn')?.classList.add('hidden');
   const nb = document.getElementById('stepNextBtn');
   if (nb) { nb.classList.add('hidden'); nb.className = 'step-nav-btn hidden'; }
+  document.getElementById('pauseBtn')?.classList.add('hidden');
 }
 
 function _updateStepBarControls(isAuto) {
   const prevBtn = document.getElementById('stepPrevBtn');
   const nextBtn = document.getElementById('stepNextBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
   if (!prevBtn || !nextBtn) return;
-  // 上一步：有歷史才顯示，且只在 manual 模式
-  if (!isAuto && _gateHistory.length > 1) {
-    prevBtn.classList.remove('hidden');
-    prevBtn.className = 'step-nav-btn';
-    prevBtn.textContent = '◀ 上一步';
-  } else {
-    prevBtn.classList.add('hidden');
-  }
-  nextBtn.classList.remove('hidden');
+
   if (isAuto) {
-    nextBtn.className = 'step-nav-btn auto-playing';
-    nextBtn.textContent = '⏸ 暫停';
+    // 自動播放：step-bar 不顯示按鈕，header 顯示暫停
+    prevBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    if (pauseBtn) pauseBtn.classList.remove('hidden');
   } else {
+    // 手動：step-bar 顯示上一步/下一步，header 暫停消失
+    if (pauseBtn) pauseBtn.classList.add('hidden');
+    if (_gateHistory.length > 1) {
+      prevBtn.classList.remove('hidden');
+      prevBtn.className = 'step-nav-btn';
+      prevBtn.textContent = '◀ 上一步';
+    } else {
+      prevBtn.classList.add('hidden');
+    }
+    nextBtn.classList.remove('hidden');
     nextBtn.className = 'step-nav-btn waiting';
     nextBtn.textContent = '下一步 ▶';
   }
@@ -1123,14 +1129,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('resetBtn').addEventListener('click', resetDemo);
 
-  // ── 上一步 / 下一步 ──
+  // ── 上一步 / 下一步 / 暫停 ──
   document.getElementById('stepPrevBtn')?.addEventListener('click', prevStep);
-  document.getElementById('stepNextBtn')?.addEventListener('click', () => {
-    // auto-playing 模式下按鈕是「⏸ 暫停」
-    const btn = document.getElementById('stepNextBtn');
-    if (btn && btn.classList.contains('auto-playing')) { pauseAutoPlay(); return; }
-    advanceStep();
-  });
+  document.getElementById('stepNextBtn')?.addEventListener('click', advanceStep);
+  document.getElementById('pauseBtn')?.addEventListener('click', pauseAutoPlay);
 
   // ── 自動播放 checkbox ──
   document.getElementById('autoPlayCheck')?.addEventListener('change', () => {
