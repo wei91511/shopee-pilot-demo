@@ -468,13 +468,98 @@ body {
 }
 @keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* ===== 響應式 ===== */
+/* ============================
+   響應式 — 768px（手機）
+   ============================ */
 @media (max-width: 768px) {
-  .demo-columns { grid-template-columns: 1fr; }
-  .sp-frame-fixed { max-width: 100%; }
+
+  /* Header */
+  .page-header { padding: 10px 14px; }
+  .page-header-inner { flex-direction: column; align-items: stretch; gap: 8px; }
+  .page-brand { gap: 10px; }
+  .page-header h1 { font-size: 15px; }
+  .page-tagline { font-size: 11px; }
+  .page-controls { justify-content: stretch; }
+  .ctrl-btn { flex: 1; justify-content: center; min-height: 44px; font-size: 14px; padding: 10px 14px; }
+
+  /* Feature Tabs */
+  .feature-tabs { padding: 0 10px; }
+  .feature-tabs-inner { overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 0; }
+  .ftab { white-space: nowrap; padding: 10px 14px; font-size: 12px; min-height: 44px; }
+
+  /* Demo Layout */
+  .demo-wrap { padding: 10px 10px 80px; }
+  .demo-columns { grid-template-columns: 1fr; gap: 10px; }
+
+  /* SP Frame */
+  .sp-frame { border-radius: 8px; }
+  .sp-frame-fixed { max-width: 100%; width: 100%; }
+  .sp-body { max-height: none; padding: 6px; }
+  .sp-header { padding: 10px 12px; }
+  .sp-header h2 { font-size: 13px; }
+
+  /* SP 按鈕觸控最佳化 */
+  .sp-action-btn { min-height: 44px; font-size: 13px; padding: 10px 8px; }
+  .sp-tab { min-height: 44px; }
+
+  /* 播放按鈕 */
+  .btn-play-tab { min-height: 44px; font-size: 13px; padding: 10px 16px; }
+  .btn-reset-tab { min-height: 44px; font-size: 13px; padding: 10px 12px; }
+
+  /* 蝦皮後台表格 */
+  .shopee-frame { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .shopee-content { padding: 8px; }
+  .s-table { font-size: 11px; }
+  .s-table th, .s-table td { padding: 6px 7px; }
+  .shopee-page-title { font-size: 13px; }
+  .shopee-nav { width: 90px; }
+  .snav-item { font-size: 11px; padding: 7px 8px; }
+  .snav-sub { font-size: 10px; padding: 4px 8px 4px 18px; }
+
+  /* TG 區塊 */
+  .tg-wrap { margin-top: 8px; }
+  .tg-message { font-size: 11px; max-width: 100%; }
+
+  /* 字幕 */
+  .step-bar { padding: 16px 20px; width: calc(100% - 28px); }
   .step-bar-inner { font-size: 17px; }
-  .step-bar { padding: 18px 24px; }
-  .feature-tabs-inner { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .ftab { white-space: nowrap; }
-  .page-header-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================
+   響應式 — 480px（小螢幕手機 / iPhone SE）
+   ============================ */
+@media (max-width: 480px) {
+
+  /* Header 更緊湊 */
+  .page-logo { font-size: 20px; }
+  .page-header h1 { font-size: 14px; }
+  .badge-demo { font-size: 10px; padding: 1px 6px; }
+
+  /* 兩欄按鈕並排 */
+  .page-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  /* Feature Tabs */
+  .ftab { padding: 8px 10px; font-size: 11px; }
+
+  /* Demo Wrap */
+  .demo-wrap { padding: 8px 8px 80px; }
+
+  /* SP */
+  .sp-card { padding: 8px; }
+  .sp-card-title { font-size: 11px; }
+  .sp-action-btn { font-size: 12px; padding: 8px 6px; }
+  .sp-body { font-size: 11px; }
+  .sp-rule-item { font-size: 10px; }
+
+  /* 蝦皮後台 */
+  .shopee-topbar { font-size: 12px; padding: 7px 10px; }
+  .shopee-nav { display: none; }
+  .shopee-content { padding: 6px; }
+  .s-table { font-size: 10px; }
+  .s-table th, .s-table td { padding: 5px 5px; }
+  .shopee-page-title { font-size: 12px; margin-bottom: 7px; }
+
+  /* 字幕更小 */
+  .step-bar { padding: 14px 16px; }
+  .step-bar-inner { font-size: 15px; line-height: 1.5; }
 }
