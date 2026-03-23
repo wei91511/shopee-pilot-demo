@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運營工具箱 Demo</title>
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div class="page-brand">
+        <span class="page-logo">🛒</span>
+        <div>
+          <h1>運營工具箱 <span class="badge-demo">互動 Demo</span></h1>
+          <p class="page-tagline">不用安裝，直接體驗完整功能</p>
+        </div>
+      </div>
+      <div class="page-controls">
+        <button id="autoPlayBtn" class="ctrl-btn ctrl-primary">
+          <span id="autoPlayIcon">▶</span> <span id="autoPlayLabel">自動播放</span>
+        </button>
+        <button id="resetBtn" class="ctrl-btn ctrl-secondary">↺ 重置</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 步驟提示列 ===== -->
+  <div class="step-bar" id="stepBar"><div class="step-bar-inner" id="stepText"></div></div>
+
+  <!-- ===== 功能 Tab 選擇 ===== -->
+  <div class="feature-tabs">
+    <div class="feature-tabs-inner">
+      <button class="ftab active" data-ftab="ad">📊 廣告管理</button>
+      <button class="ftab" data-ftab="flash">🏷️ 限時特賣</button>
+      <button class="ftab" data-ftab="voucher">🎫 優惠券</button>
+    </div>
+  </div>
+
+  <!-- ===== 主體 ===== -->
+  <main class="demo-wrap">
+
+    <!-- ==============================
+         廣告管理 Tab
+         ============================== -->
+    <div class="ftab-content active" id="ftab-ad">
+      <div class="demo-columns">
+
+        <!-- ── 左：Side Panel ── -->
+        <div class="sp-frame" id="spFrame">
+          <div class="sp-header">
+            <div class="sp-header-top">
+              <h2>🛒 運營工具箱</h2>
+              <div class="sp-header-actions">
+                <button class="sp-icon-btn">⚙️</button>
+                <button class="sp-icon-btn">🔄</button>
+              </div>
+            </div>
+            <p class="sp-header-sub">蝦皮賣家多功能管理工具</p>
+          </div>
+
+          <div class="sp-tab-bar">
+            <button class="sp-tab active" data-sptab="ad">
+              <span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span>
+            </button>
+            <button class="sp-tab" data-sptab="flash">
+              <span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span>
+            </button>
+            <button class="sp-tab" data-sptab="coupon">
+              <span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span>
+            </button>
+            <button class="sp-tab" data-sptab="discount">
+              <span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span>
+            </button>
+          </div>
+
+          <div class="sp-body" id="spBody">
+
+            <!-- SP: 廣告管理 -->
+            <div class="sp-tab-content active" id="sptab-ad">
+
+              <!-- 賣場資訊 -->
+              <div class="sp-card">
+                <div class="sp-shop-row">
+                  <span class="sp-dot green"></span>
+                  <span class="sp-shop-name">商店名稱</span>
+                  <span class="sp-version">v4.2.6</span>
+                </div>
+              </div>
+
+              <!-- 調整規則 -->
+              <div class="sp-card" id="spRulesCard">
+                <div class="sp-section-header">
+                  <span>📋 調整規則</span>
+                  <button class="sp-edit-link">編輯</button>
+                </div>
+                <div class="sp-rules-list">
+                  <div class="sp-rule-item">
+                    <span class="sp-badge trigger">觸發</span>
+                    <span>餘額&lt;10元 → 以花費為基準調整</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge custom">#1</span>
+                    <span>點擊率 ≥ 3.85% → +5元</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge custom">#2</span>
+                    <span>投入產出比 ≥ 10 → +20元</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge roas">ROAS</span>
+                    <span>ROAS達標 → +15元</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge fallback">預設</span>
+                    <span>其他 → +4元</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge limit">上限</span>
+                    <span>單筆上限 200元</span>
+                  </div>
+                  <div class="sp-rule-item">
+                    <span class="sp-badge limit">上限</span>
+                    <span>總預算上限 2500元</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 掃描 & 執行 -->
+              <div class="sp-btn-row">
+                <button class="sp-action-btn sp-primary" id="scanBtn">🔍 掃描廣告</button>
+                <button class="sp-action-btn sp-success" id="executeBtn" disabled>✅ 執行調整</button>
+              </div>
+
+              <!-- 緊急停止 -->
+              <button class="sp-action-btn sp-danger sp-full hidden" id="stopBtn">🛑 緊急停止</button>
+
+              <!-- 進度條 -->
+              <div class="sp-progress hidden" id="spProgress">
+                <div class="sp-progress-label">
+                  <span id="spProgressLabel">處理中...</span>
+                  <span id="spProgressPct"></span>
+                </div>
+                <div class="sp-progress-track">
+                  <div class="sp-progress-fill" id="spProgressFill"></div>
+                </div>
+              </div>
+
+              <!-- 掃描結果 -->
+              <div class="sp-result-panel hidden" id="scanResultPanel"></div>
+              <!-- 執行結果 -->
+              <div class="sp-result-panel hidden" id="executeResultPanel"></div>
+
+              <!-- 操作記錄 -->
+              <div class="sp-card">
+                <div class="sp-section-header">
+                  <span>📝 操作記錄</span>
+                  <div>
+                    <button class="sp-icon-btn-sm">📥</button>
+                    <button class="sp-icon-btn-sm">🗑️</button>
+                  </div>
+                </div>
+                <div class="sp-log" id="spLog">
+                  <div class="sp-log-empty">尚無操作記錄</div>
+                </div>
+              </div>
+
+              <!-- 其他動作 -->
+              <button class="sp-action-btn sp-outline sp-full" style="margin-bottom:6px;">🔄 重置預算</button>
+              <button class="sp-action-btn sp-secondary sp-full" style="margin-bottom:6px;">📊 分析健康度</button>
+              <button class="sp-action-btn sp-outline sp-full" style="margin-bottom:8px;">📤 測試推播</button>
+
+              <!-- 排程設定（移至底部） -->
+              <div class="sp-card" id="spScheduleCard">
+                <div class="sp-section-header">
+                  <span>⏰ 排程設定</span>
+                  <label class="sp-toggle">
+                    <input type="checkbox" id="scheduleToggle" checked>
+                    <span class="sp-toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="sp-schedule-edit" id="spScheduleEdit">
+                  <div class="sp-row-col">
+                    <label class="sp-small-label">執行分鐘（可多選）</label>
+                    <div class="sp-minute-chips">
+                      <label class="sp-mchip"><input type="checkbox" value="0"  checked disabled><span>0分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="5"  disabled><span>5分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="10" disabled><span>10分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="15" disabled><span>15分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="20" disabled><span>20分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="25" disabled><span>25分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="30" checked disabled><span>30分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="35" disabled><span>35分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="40" disabled><span>40分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="45" disabled><span>45分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="50" disabled><span>50分</span></label>
+                      <label class="sp-mchip"><input type="checkbox" value="55" disabled><span>55分</span></label>
+                    </div>
+                  </div>
+                  <div class="sp-settings-row">
+                    <label class="sp-small-label">開始時間</label>
+                    <select id="spStartHour" class="sp-select-sm" disabled>
+                      <option value="8" selected>8</option>
+                    </select>
+                    <span class="sp-unit">時</span>
+                  </div>
+                  <div class="sp-settings-row">
+                    <label class="sp-small-label">結束時間</label>
+                    <select id="spEndHour" class="sp-select-sm" disabled>
+                      <option value="24" selected>24</option>
+                    </select>
+                    <span class="sp-unit">時</span>
+                  </div>
+                  <div class="sp-settings-row">
+                    <label class="sp-small-label">自動切換頁面</label>
+                    <label class="sp-toggle sp-toggle-sm">
+                      <input type="checkbox" disabled>
+                      <span class="sp-toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="sp-detail-row">
+                    <span class="sp-detail-label">上次執行</span>
+                    <span class="sp-last-run" id="spLastRun">2026/3/23 下午5:35</span>
+                  </div>
+                  <button class="sp-action-btn sp-primary sp-full" id="spScheduleSave" disabled>
+                    💾 儲存排程設定
+                  </button>
+                </div>
+                <!-- 倒數計時（自動播放時顯示） -->
+                <div class="sp-countdown hidden" id="spCountdown">
+                  <span class="sp-countdown-label">下次執行</span>
+                  <span class="sp-countdown-time" id="spCountdownTime">--:--</span>
+                </div>
+              </div>
+
+            </div><!-- /sptab-ad -->
+
+            <!-- SP: 限時特賣 -->
+            <div class="sp-tab-content" id="sptab-flash">
+              <div class="sp-card">
+                <h3 class="sp-card-title">🏷️ 快速設定活動庫存</h3>
+                <div class="sp-mode-selector">
+                  <label class="sp-radio">
+                    <input type="radio" name="spStockMode" value="divide" checked>
+                    <span>庫存除以</span>
+                    <input type="number" value="2" min="1" max="10" class="sp-num-input">
+                    <span class="sp-unit">（無條件進位）</span>
+                  </label>
+                  <label class="sp-radio">
+                    <input type="radio" name="spStockMode" value="fixed">
+                    <span>統一數量</span>
+                    <input type="number" value="10" min="1" max="99" class="sp-num-input">
+                    <span class="sp-unit">個</span>
+                  </label>
+                </div>
+                <div class="sp-btn-row">
+                  <button class="sp-action-btn sp-secondary">🔍 預覽變更</button>
+                  <button class="sp-action-btn sp-primary" disabled>🚀 執行修改</button>
+                </div>
+                <label class="sp-checkbox"><input type="checkbox" checked><span>執行後自動全選</span></label>
+                <label class="sp-checkbox"><input type="checkbox"><span>一次性完成（自動啟用 + 確定）</span></label>
+              </div>
+              <div class="sp-card sp-info-card">
+                <h3 class="sp-card-title warn">⚠️ 防呆規則</h3>
+                <ul class="sp-info-list">
+                  <li>活動庫存範圍：1 ~ 99</li>
+                  <li>不得超過現有庫存數量</li>
+                  <li>庫存為 0 的規格自動跳過</li>
+                </ul>
+              </div>
+              <button class="sp-action-btn sp-outline sp-full">📱 測試推播</button>
+            </div>
+
+            <!-- SP: 優惠券 -->
+            <div class="sp-tab-content" id="sptab-coupon">
+              <div class="sp-card">
+                <h3 class="sp-card-title">📅 優惠券可使用時間</h3>
+                <div class="sp-date-row">
+                  <span class="sp-date-label">開始</span>
+                  <input class="sp-date-input" type="text" placeholder="yyyymmddhhmm" value="202604010000">
+                </div>
+                <div class="sp-date-row">
+                  <span class="sp-date-label">結束</span>
+                  <input class="sp-date-input" type="text" placeholder="yyyymmddhhmm" value="202604300000">
+                </div>
+              </div>
+              <div class="sp-card">
+                <label class="sp-checkbox" style="margin:0;">
+                  <input type="checkbox" checked>
+                  <span>自動生成優惠券代碼（5碼英數字）</span>
+                </label>
+              </div>
+              <button class="sp-action-btn sp-primary sp-full" style="margin-bottom:8px;">🚀 快速填入</button>
+              <div class="sp-card">
+                <h3 class="sp-card-title">📋 範本</h3>
+                <div class="sp-template-list">
+                  <div class="sp-template-item">
+                    <span class="sp-template-name">滿199折10</span>
+                    <div class="sp-template-btns">
+                      <button class="sp-t-btn sp-t-apply" title="套用">✓</button>
+                      <button class="sp-t-btn" title="置頂">📌</button>
+                      <button class="sp-t-btn" title="刪除">🗑</button>
+                    </div>
+                  </div>
+                  <div class="sp-template-item">
+                    <span class="sp-template-name">滿399折25</span>
+                    <div class="sp-template-btns">
+                      <button class="sp-t-btn sp-t-apply">✓</button>
+                      <button class="sp-t-btn">📌</button>
+                      <button class="sp-t-btn">🗑</button>
+                    </div>
+                  </div>
+                  <div class="sp-template-item">
+                    <span class="sp-template-name">滿599折50</span>
+                    <div class="sp-template-btns">
+                      <button class="sp-t-btn sp-t-apply">✓</button>
+                      <button class="sp-t-btn">📌</button>
+                      <button class="sp-t-btn">🗑</button>
+                    </div>
+                  </div>
+                  <div class="sp-template-item">
+                    <span class="sp-template-name">【週年慶】滿999折100</span>
+                    <div class="sp-template-btns">
+                      <button class="sp-t-btn sp-t-apply">✓</button>
+                      <button class="sp-t-btn">📌</button>
+                      <button class="sp-t-btn">🗑</button>
+                    </div>
+                  </div>
+                  <div class="sp-template-item">
+                    <span class="sp-template-name">【新客專屬】滿299折20</span>
+                    <div class="sp-template-btns">
+                      <button class="sp-t-btn sp-t-apply">✓</button>
+                      <button class="sp-t-btn">📌</button>
+                      <button class="sp-t-btn">🗑</button>
+                    </div>
+                  </div>
+                </div>
+                <button class="sp-add-template-btn">＋ 新增範本</button>
+              </div>
+            </div>
+
+            <!-- SP: 折扣活動 -->
+            <div class="sp-tab-content" id="sptab-discount">
+              <div class="sp-coming-soon">
+                <div class="sp-cs-icon">💰</div>
+                <h3>折扣活動管理</h3>
+                <p>批量管理折扣活動<br>即將推出，敬請期待</p>
+              </div>
+            </div>
+
+          </div><!-- /sp-body -->
+          <div class="sp-footer"><span class="sp-footer-ver">v4.2.6</span></div>
+        </div><!-- /sp-frame -->
+
+        <!-- ── 右：蝦皮後台 ── -->
+        <div class="shopee-frame" id="shopeeFrame">
+
+          <!-- 廣告管理後台 -->
+          <div class="s-page active" id="spage-ad">
+            <div class="shopee-topbar">
+              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
+              <span class="shopee-shop">商店名稱</span>
+            </div>
+            <div class="shopee-body">
+              <nav class="shopee-nav">
+                <div class="snav-item">📦 商品管理</div>
+                <div class="snav-item">📋 訂單管理</div>
+                <div class="snav-item active">📣 行銷中心</div>
+                <div class="snav-sub active">↳ 蝦皮廣告</div>
+                <div class="snav-item">🏷️ 限時特賣</div>
+                <div class="snav-item">🎫 優惠券</div>
+                <div class="snav-item">📊 數據中心</div>
+              </nav>
+              <div class="shopee-content">
+                <div class="shopee-page-title">蝦皮廣告</div>
+                <div class="shopee-date-bar">
+                  <span class="s-date-btn">今天</span>
+                  <span class="s-date-btn">昨天</span>
+                  <span class="s-date-btn s-date-active">最近7天 ▾</span>
+                  <span class="s-date-btn">最近30天</span>
+                </div>
+                <table class="s-table">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" checked></th>
+                      <th>商品</th>
+                      <th>狀態</th>
+                      <th>日預算</th>
+                      <th>花費</th>
+                      <th>ROAS</th>
+                      <th>點擊率</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adTableBody">
+                    <tr data-id="A">
+                      <td><input type="checkbox" class="ad-cb" checked></td>
+                      <td>
+                        <div class="s-product">
+                          <div class="s-product-img">🎧</div>
+                          <span class="s-ad-name">藍芽耳機旗艦款</span>
+                        </div>
+                      </td>
+                      <td><span class="s-badge green">投放中</span></td>
+                      <td class="s-budget" data-orig="170">$170</td>
+                      <td>$162</td>
+                      <td class="s-good">6.2</td>
+                      <td class="s-good">4.1%</td>
+                    </tr>
+                    <tr data-id="B">
+                      <td><input type="checkbox" class="ad-cb" checked></td>
+                      <td>
+                        <div class="s-product">
+                          <div class="s-product-img">📱</div>
+                          <span class="s-ad-name">手機殼多色款</span>
+                        </div>
+                      </td>
+                      <td><span class="s-badge green">投放中</span></td>
+                      <td class="s-budget" data-orig="85">$85</td>
+                      <td>$80</td>
+                      <td class="s-ok">4.8</td>
+                      <td class="s-good">3.5%</td>
+                    </tr>
+                    <tr data-id="C">
+                      <td><input type="checkbox" class="ad-cb" checked></td>
+                      <td>
+                        <div class="s-product">
+                          <div class="s-product-img">🔌</div>
+                          <span class="s-ad-name">快充線三件組</span>
+                        </div>
+                      </td>
+                      <td><span class="s-badge green">投放中</span></td>
+                      <td class="s-budget" data-orig="85">$85</td>
+                      <td>$77</td>
+                      <td class="s-ok">5.1</td>
+                      <td class="s-warn">1.8%</td>
+                    </tr>
+                    <tr data-id="D">
+                      <td><input type="checkbox" class="ad-cb" checked></td>
+                      <td>
+                        <div class="s-product">
+                          <div class="s-product-img">🛡️</div>
+                          <span class="s-ad-name">螢幕保護貼</span>
+                        </div>
+                      </td>
+                      <td><span class="s-badge green">投放中</span></td>
+                      <td class="s-budget" data-orig="90">$90</td>
+                      <td>$88</td>
+                      <td class="s-good">5.5</td>
+                      <td class="s-good">3.2%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 限時特賣後台 -->
+          <div class="s-page" id="spage-flash">
+            <div class="shopee-topbar">
+              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
+              <span class="shopee-shop">商店名稱</span>
+            </div>
+            <div class="shopee-body">
+              <nav class="shopee-nav">
+                <div class="snav-item">📦 商品管理</div>
+                <div class="snav-item">📣 行銷中心</div>
+                <div class="snav-item active">🏷️ 限時特賣</div>
+                <div class="snav-sub active">↳ 設定商品</div>
+              </nav>
+              <div class="shopee-content">
+                <div class="shopee-page-title">設定商品</div>
+                <table class="s-table">
+                  <thead>
+                    <tr>
+                      <th><input type="checkbox" checked></th>
+                      <th>商品名稱/規格</th>
+                      <th>原售價</th>
+                      <th>折扣後售價</th>
+                      <th>折扣</th>
+                      <th>活動庫存</th>
+                      <th>購買限制</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="checkbox" checked></td>
+                      <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 黑色</span></div></td>
+                      <td>$599</td>
+                      <td class="s-ok">$509</td>
+                      <td>85折</td>
+                      <td class="s-flash-stock" id="flash-stock-1">5</td>
+                      <td>1件</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" checked></td>
+                      <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 白色</span></div></td>
+                      <td>$599</td>
+                      <td class="s-ok">$509</td>
+                      <td>85折</td>
+                      <td class="s-flash-stock" id="flash-stock-2">3</td>
+                      <td>1件</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" checked></td>
+                      <td><div class="s-product"><div class="s-product-img">📱</div><span>手機殼 / iPhone 15</span></div></td>
+                      <td>$299</td>
+                      <td class="s-ok">$249</td>
+                      <td>83折</td>
+                      <td class="s-flash-stock" id="flash-stock-3">10</td>
+                      <td>2件</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 優惠券後台 -->
+          <div class="s-page" id="spage-coupon">
+            <div class="shopee-topbar">
+              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
+              <span class="shopee-shop">商店名稱</span>
+            </div>
+            <div class="shopee-body">
+              <nav class="shopee-nav">
+                <div class="snav-item">📣 行銷中心</div>
+                <div class="snav-item active">🎫 優惠券</div>
+                <div class="snav-sub active">↳ 建立優惠券</div>
+              </nav>
+              <div class="shopee-content">
+                <div class="shopee-page-title">建立優惠券</div>
+                <div class="s-form">
+                  <div class="s-form-section">
+                    <div class="s-form-title">基本資訊</div>
+                    <div class="s-form-row">
+                      <label>優惠券名稱</label>
+                      <div class="s-form-input" id="svoucherName">常駐299-5</div>
+                    </div>
+                    <div class="s-form-row">
+                      <label>優惠代碼</label>
+                      <div class="s-form-input mono" id="svoucherCode">A7K2P</div>
+                    </div>
+                    <div class="s-form-row">
+                      <label>使用期間</label>
+                      <div class="s-form-input" id="svoucherPeriod">
+                        <span id="sVStart">2026/04/01 00:00</span> 至 <span id="sVEnd">2026/04/30 00:00</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="s-form-section">
+                    <div class="s-form-title">折扣設定</div>
+                    <div class="s-form-row">
+                      <label>折扣類型</label>
+                      <div class="s-form-input">折扣</div>
+                    </div>
+                    <div class="s-form-row">
+                      <label>折扣金額</label>
+                      <div class="s-form-input">NT$5</div>
+                    </div>
+                    <div class="s-form-row">
+                      <label>最低消費</label>
+                      <div class="s-form-input">NT$299</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /shopee-frame -->
+      </div><!-- /demo-columns -->
+
+      <!-- TG 通知 -->
+      <div class="tg-wrap">
+        <div class="tg-card">
+          <div class="tg-card-header">
+            <span>📱 Telegram 推播模擬</span>
+            <span class="tg-hint">排程執行完成後自動推播</span>
+          </div>
+          <div class="tg-chat" id="tgChat">
+            <div class="tg-empty">排程自動執行後，通知將顯示於此 📬</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ftab-ad -->
+
+    <!-- ==============================
+         限時特賣 Tab
+         ============================== -->
+    <div class="ftab-content" id="ftab-flash">
+      <!-- 每個 Tab 獨立播放按鈕 -->
+      <div class="tab-controls">
+        <button class="btn-play-tab" id="playFlashSaleBtn">▶ 播放演示</button>
+        <button class="btn-reset-tab" id="resetFlashSaleBtn">↺ 重置</button>
+      </div>
+      <div class="demo-columns">
+        <div class="sp-frame sp-frame-fixed">
+          <div class="sp-header">
+            <div class="sp-header-top"><h2>🛒 運營工具箱</h2></div>
+            <p class="sp-header-sub">蝦皮賣家多功能管理工具</p>
+          </div>
+          <div class="sp-tab-bar">
+            <button class="sp-tab" data-sptab2="ad"><span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span></button>
+            <button class="sp-tab active" data-sptab2="flash"><span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span></button>
+            <button class="sp-tab" data-sptab2="coupon"><span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span></button>
+            <button class="sp-tab" data-sptab2="discount"><span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span></button>
+          </div>
+          <div class="sp-body">
+            <!-- 主要設定卡 -->
+            <div class="sp-card" id="flashModeCard">
+              <h3 class="sp-card-title">🏷️ 快速設定活動庫存</h3>
+              <div class="sp-mode-selector">
+                <label class="sp-radio" id="flashModeLabel1">
+                  <input type="radio" name="fMode2" checked>
+                  <span>庫存除以</span>
+                  <input type="number" value="2" class="sp-num-input">
+                  <span class="sp-unit">（無條件進位）</span>
+                </label>
+                <label class="sp-radio">
+                  <input type="radio" name="fMode2">
+                  <span>統一數量</span>
+                  <input type="number" value="10" class="sp-num-input">
+                  <span class="sp-unit">個</span>
+                </label>
+              </div>
+              <div class="sp-btn-row">
+                <button class="sp-action-btn sp-secondary" id="flashPreviewBtn">🔍 預覽變更</button>
+                <button class="sp-action-btn sp-primary" id="flashExecuteBtn" disabled>🚀 執行修改</button>
+              </div>
+              <!-- 進度條 -->
+              <div class="sp-progress hidden" id="flashProgress">
+                <div class="sp-progress-label">
+                  <span id="flashProgressLabel">處理中...</span>
+                </div>
+                <div class="sp-progress-track">
+                  <div class="sp-progress-fill" id="flashProgressFill"></div>
+                </div>
+              </div>
+              <!-- 結果面板 -->
+              <div class="sp-result-panel hidden" id="flashResultPanel"></div>
+              <label class="sp-checkbox"><input type="checkbox" checked><span>執行後自動全選</span></label>
+              <label class="sp-checkbox"><input type="checkbox"><span>一次性完成（自動啟用 + 確定）</span></label>
+            </div>
+            <div class="sp-card sp-info-card">
+              <h3 class="sp-card-title warn">⚠️ 防呆規則</h3>
+              <ul class="sp-info-list">
+                <li>活動庫存範圍：1 ~ 99</li>
+                <li>不得超過現有庫存數量</li>
+                <li>庫存為 0 的規格自動跳過</li>
+              </ul>
+            </div>
+            <button class="sp-action-btn sp-outline sp-full">📱 測試推播</button>
+          </div>
+        </div>
+        <!-- 蝦皮後台（含互動 ID） -->
+        <div class="shopee-frame">
+          <div class="shopee-topbar">
+            <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
+            <span class="shopee-shop">商店名稱</span>
+          </div>
+          <div class="shopee-body">
+            <nav class="shopee-nav">
+              <div class="snav-item active">🏷️ 限時特賣</div>
+              <div class="snav-sub active">↳ 設定商品</div>
+            </nav>
+            <div class="shopee-content">
+              <div class="shopee-page-title">設定商品</div>
+              <table class="s-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" checked></th>
+                    <th>商品名稱/規格</th>
+                    <th>原售價</th>
+                    <th>折扣後售價</th>
+                    <th>折扣</th>
+                    <th>活動庫存</th>
+                    <th>購買限制</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="f2-row-1">
+                    <td><input type="checkbox" checked></td>
+                    <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 黑色</span></div></td>
+                    <td>$599</td><td class="s-ok">$509</td><td>85折</td>
+                    <td class="s-flash-stock" id="f2-stock-1" data-orig="14">14</td>
+                    <td>1件</td>
+                  </tr>
+                  <tr id="f2-row-2">
+                    <td><input type="checkbox" checked></td>
+                    <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 白色</span></div></td>
+                    <td>$599</td><td class="s-ok">$509</td><td>85折</td>
+                    <td class="s-flash-stock" id="f2-stock-2" data-orig="20">20</td>
+                    <td>1件</td>
+                  </tr>
+                  <tr id="f2-row-3">
+                    <td><input type="checkbox" checked></td>
+                    <td><div class="s-product"><div class="s-product-img">📱</div><span>手機殼 / iPhone 15</span></div></td>
+                    <td>$299</td><td class="s-ok">$249</td><td>83折</td>
+                    <td class="s-flash-stock" id="f2-stock-3" data-orig="8">8</td>
+                    <td>2件</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ftab-flash -->
+
+    <!-- ==============================
+         優惠券 Tab
+         ============================== -->
+    <div class="ftab-content" id="ftab-voucher">
+      <!-- 每個 Tab 獨立播放按鈕 -->
+      <div class="tab-controls">
+        <button class="btn-play-tab" id="playVoucherBtn">▶ 播放演示</button>
+        <button class="btn-reset-tab" id="resetVoucherBtn">↺ 重置</button>
+      </div>
+      <div class="demo-columns">
+        <div class="sp-frame sp-frame-fixed">
+          <div class="sp-header">
+            <div class="sp-header-top"><h2>🛒 運營工具箱</h2></div>
+            <p class="sp-header-sub">蝦皮賣家多功能管理工具</p>
+          </div>
+          <div class="sp-tab-bar">
+            <button class="sp-tab" data-sptab3="ad"><span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span></button>
+            <button class="sp-tab" data-sptab3="flash"><span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span></button>
+            <button class="sp-tab active" data-sptab3="coupon"><span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span></button>
+            <button class="sp-tab" data-sptab3="discount"><span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span></button>
+          </div>
+          <div class="sp-body">
+            <div class="sp-card">
+              <h3 class="sp-card-title">📅 優惠券可使用時間</h3>
+              <div class="sp-date-row">
+                <span class="sp-date-label">開始</span>
+                <input class="sp-date-input" id="vStartDate" type="text" value="202604010000">
+              </div>
+              <div class="sp-date-row">
+                <span class="sp-date-label">結束</span>
+                <input class="sp-date-input" id="vEndDate" type="text" value="202604300000">
+              </div>
+            </div>
+            <div class="sp-card">
+              <label class="sp-checkbox" style="margin:0;"><input type="checkbox" checked><span>自動生成優惠券代碼（5碼英數字）</span></label>
+              <div class="sp-code-preview" id="vCodeDisplay">--</div>
+            </div>
+            <button class="sp-action-btn sp-primary sp-full" id="vFillBtn" style="margin-bottom:8px;">🚀 快速填入</button>
+            <div class="sp-card">
+              <h3 class="sp-card-title">📋 範本</h3>
+              <div class="sp-template-list" id="vTplList">
+                <div class="sp-template-item"><span class="sp-template-name">滿199折10</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
+                <div class="sp-template-item"><span class="sp-template-name">滿399折25</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
+                <div class="sp-template-item"><span class="sp-template-name">滿599折50</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
+                <div class="sp-template-item"><span class="sp-template-name">【週年慶】滿999折100</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
+                <div class="sp-template-item"><span class="sp-template-name">【新客專屬】滿299折20</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
+              </div>
+              <button class="sp-add-template-btn">＋ 新增範本</button>
+            </div>
+          </div>
+        </div>
+        <!-- 蝦皮後台（含互動 ID，初始空白） -->
+        <div class="shopee-frame">
+          <div class="shopee-topbar">
+            <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
+            <span class="shopee-shop">商店名稱</span>
+          </div>
+          <div class="shopee-body">
+            <nav class="shopee-nav">
+              <div class="snav-item active">🎫 優惠券</div>
+              <div class="snav-sub active">↳ 建立優惠券</div>
+            </nav>
+            <div class="shopee-content">
+              <div class="shopee-page-title">建立優惠券</div>
+              <div class="s-form">
+                <div class="s-form-section">
+                  <div class="s-form-title">基本資訊</div>
+                  <div class="s-form-row"><label>優惠券名稱</label><div class="s-form-input" id="v2-name">—</div></div>
+                  <div class="s-form-row"><label>優惠代碼</label><div class="s-form-input mono" id="v2-code">—</div></div>
+                  <div class="s-form-row"><label>使用期間</label><div class="s-form-input" id="v2-period">—</div></div>
+                </div>
+                <div class="s-form-section">
+                  <div class="s-form-title">折扣設定</div>
+                  <div class="s-form-row"><label>折扣類型</label><div class="s-form-input">折扣</div></div>
+                  <div class="s-form-row"><label>折扣金額</label><div class="s-form-input" id="v2-discount">—</div></div>
+                  <div class="s-form-row"><label>最低消費</label><div class="s-form-input" id="v2-minimum">—</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ftab-voucher -->
+
+  </main>
+
+  <footer class="page-footer">
+    <p>運營工具箱 © 2026 ｜ 本頁面為功能展示用途</p>
+  </footer>
+
+  <script src="demo.js"></script>
+</body>
+</html>
