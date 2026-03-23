@@ -20,15 +20,21 @@
       </div>
       <div class="page-controls">
         <button id="autoPlayBtn" class="ctrl-btn ctrl-primary">
-          <span id="autoPlayIcon">▶</span> <span id="autoPlayLabel">自動播放</span>
+          <span id="autoPlayIcon">▶</span> <span id="autoPlayLabel">開始演示</span>
         </button>
+        <label class="ctrl-btn ctrl-secondary ctrl-check-label">
+          <input type="checkbox" id="autoPlayCheck" checked> 自動播放
+        </label>
         <button id="resetBtn" class="ctrl-btn ctrl-secondary">↺ 重置</button>
       </div>
     </div>
   </header>
 
   <!-- ===== 步驟提示列 ===== -->
-  <div class="step-bar" id="stepBar"><div class="step-bar-inner" id="stepText"></div></div>
+  <div class="step-bar" id="stepBar">
+    <div class="step-bar-inner" id="stepText"></div>
+    <button id="stepNextBtn" class="step-next-btn hidden">下一步 ▶</button>
+  </div>
 
   <!-- ===== 功能 Tab 選擇 ===== -->
   <div class="feature-tabs">
