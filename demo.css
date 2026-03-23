@@ -110,27 +110,26 @@ body {
   text-shadow: 0 2px 10px rgba(0,0,0,0.8);
   line-height: 1.55;
 }
-/* 下一步按鈕（內嵌在 step-bar） */
-.step-next-btn {
-  display: block;
-  margin: 14px auto 0;
-  padding: 9px 32px;
+/* 上一步 / 下一步 按鈕列 */
+.step-bar-btns { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.step-nav-btn {
+  padding: 9px 28px;
   border: 2px solid rgba(255,255,255,0.5);
-  background: transparent;
-  color: #fff;
-  border-radius: 9px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.5px;
+  background: transparent; color: #fff;
+  border-radius: 9px; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
 }
-.step-next-btn:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
-.step-next-btn.waiting {
-  border-color: var(--shopee);
-  color: var(--shopee);
+.step-nav-btn:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
+.step-nav-btn.waiting {
+  border-color: var(--shopee); color: var(--shopee);
   animation: btnAttention 1.2s ease-out infinite;
 }
+/* 自動播放中狀態：顯示「⏸ 暫停」 */
+.step-nav-btn.auto-playing {
+  border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.65);
+  font-size: 13px; font-weight: 500; letter-spacing: 0;
+}
+.step-nav-btn.auto-playing:hover { border-color: #f59e0b; color: #f59e0b; background: rgba(245,158,11,0.08); }
 
 /* ===== Generic hidden ===== */
 .hidden { display: none !important; }

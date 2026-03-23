@@ -49,13 +49,92 @@ async function safeDelay(ms) {
 }
 
 // ========================
-//  StepGate — 下一步控制
+//  StepGate — 步驟控制
 // ========================
-const AUTO_STEP_DELAY = 6000;  // 自動播放每步停留 6 秒
+const AUTO_STEP_DELAY = 6000;
 let _stepResolve = null;
+let _cancelAutoAdvance = null;
+const _gateHistory = [];       // 每個 gate 的字幕文字
+let _historyBrowseIdx = -1;    // -1 = 在最新步驟，>=0 = 正在瀏覽歷史
 
-// 外部呼叫：立刻跳到下一步
+function _hideStepBtns() {
+  document.getElementById('stepPrevBtn')?.classList.add('hidden');
+  const nb = document.getElementById('stepNextBtn');
+  if (nb) { nb.classList.add('hidden'); nb.className = 'step-nav-btn hidden'; }
+}
+
+function _updateStepBarControls(isAuto) {
+  const prevBtn = document.getElementById('stepPrevBtn');
+  const nextBtn = document.getElementById('stepNextBtn');
+  if (!prevBtn || !nextBtn) return;
+  // 上一步：有歷史才顯示，且只在 manual 模式
+  if (!isAuto && _gateHistory.length > 1) {
+    prevBtn.classList.remove('hidden');
+    prevBtn.className = 'step-nav-btn';
+    prevBtn.textContent = '◀ 上一步';
+  } else {
+    prevBtn.classList.add('hidden');
+  }
+  nextBtn.classList.remove('hidden');
+  if (isAuto) {
+    nextBtn.className = 'step-nav-btn auto-playing';
+    nextBtn.textContent = '⏸ 暫停';
+  } else {
+    nextBtn.className = 'step-nav-btn waiting';
+    nextBtn.textContent = '下一步 ▶';
+  }
+}
+
+// 暫停自動播放（取消計時，切換成手動模式）
+function pauseAutoPlay() {
+  if (_cancelAutoAdvance) { _cancelAutoAdvance(); _cancelAutoAdvance = null; }
+  const check = document.getElementById('autoPlayCheck');
+  if (check) check.checked = false;
+  if (_stepResolve) _updateStepBarControls(false);
+}
+
+// 前往上一步（只切換字幕顯示，不影響動畫狀態）
+function prevStep() {
+  const len = _gateHistory.length;
+  if (len < 2) return;
+  // 若在最新 → 從倒數第2開始
+  const cur = _historyBrowseIdx === -1 ? len - 1 : _historyBrowseIdx;
+  if (cur <= 0) return;
+  _historyBrowseIdx = cur - 1;
+  const bar = document.getElementById('stepBar');
+  const el = document.getElementById('stepText');
+  if (el) el.textContent = _gateHistory[_historyBrowseIdx];
+  if (bar) { bar.classList.remove('step-visible'); setTimeout(() => { bar.classList.add('step-visible'); }, 50); }
+  // 按鈕變成純瀏覽模式（both visible, no pulsing）
+  const prevBtn = document.getElementById('stepPrevBtn');
+  const nextBtn = document.getElementById('stepNextBtn');
+  if (prevBtn) prevBtn.className = _historyBrowseIdx > 0 ? 'step-nav-btn' : 'step-nav-btn hidden';
+  if (nextBtn) { nextBtn.className = 'step-nav-btn'; nextBtn.textContent = '下一步 ▶'; }
+}
+
+// 下一步：若在瀏覽歷史則前進；若在最新則推進動畫
 function advanceStep() {
+  if (_historyBrowseIdx !== -1) {
+    const len = _gateHistory.length;
+    const next = _historyBrowseIdx + 1;
+    if (next < len - 1) {
+      // 仍在歷史中
+      _historyBrowseIdx = next;
+      const el = document.getElementById('stepText');
+      if (el) el.textContent = _gateHistory[_historyBrowseIdx];
+      const prevBtn = document.getElementById('stepPrevBtn');
+      const nextBtn = document.getElementById('stepNextBtn');
+      if (prevBtn) prevBtn.className = 'step-nav-btn';
+      if (nextBtn) { nextBtn.className = 'step-nav-btn'; nextBtn.textContent = '下一步 ▶'; }
+    } else {
+      // 回到最新步驟
+      _historyBrowseIdx = -1;
+      const el = document.getElementById('stepText');
+      if (el) el.textContent = _gateHistory[len - 1];
+      _updateStepBarControls(false); // manual mode, at latest
+    }
+    return;
+  }
   if (_stepResolve) _stepResolve();
 }
 
@@ -64,13 +143,13 @@ async function stepGate() {
 
   const check = document.getElementById('autoPlayCheck');
   const isAuto = !check || check.checked;
-  const btn = document.getElementById('stepNextBtn');
 
-  // 顯示「下一步」按鈕（manual 模式用 waiting 動畫，auto 模式也可點擊跳過）
-  if (btn) {
-    btn.classList.remove('hidden', 'waiting');
-    if (!isAuto) btn.classList.add('waiting');
-  }
+  // 記錄當前字幕到歷史
+  const currentText = document.getElementById('stepText')?.textContent || '';
+  _gateHistory.push(currentText);
+  _historyBrowseIdx = -1;
+
+  _updateStepBarControls(isAuto);
 
   await new Promise((resolve, reject) => {
     let done = false;
@@ -78,7 +157,7 @@ async function stepGate() {
     const poll = setInterval(() => {
       if (stopRequested && !done) {
         done = true; clearTimeout(timeout); clearInterval(poll);
-        _stepResolve = null;
+        _stepResolve = null; _cancelAutoAdvance = null;
         reject(new Error('STOP'));
       }
     }, 80);
@@ -86,15 +165,17 @@ async function stepGate() {
     function finish() {
       if (done) return;
       done = true; clearTimeout(timeout); clearInterval(poll);
-      _stepResolve = null;
+      _stepResolve = null; _cancelAutoAdvance = null;
       resolve();
     }
+    function cancelAuto() { clearTimeout(timeout); timeout = null; }
 
     _stepResolve = finish;
+    _cancelAutoAdvance = cancelAuto;
     if (isAuto) timeout = setTimeout(finish, AUTO_STEP_DELAY);
   });
 
-  if (btn) { btn.classList.add('hidden'); btn.classList.remove('waiting'); }
+  _hideStepBtns();
 }
 
 // ========================
@@ -790,11 +871,10 @@ function resetDemo() {
   isPlaying = false;
   stopRequested = false;
   clearTimeout(_stepTimer);
-  _stepResolve = null;
+  _stepResolve = null; _cancelAutoAdvance = null;
+  _gateHistory.length = 0; _historyBrowseIdx = -1;
   spotlightOff();
-
-  const nextBtn = document.getElementById('stepNextBtn');
-  if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('waiting'); }
+  _hideStepBtns();
 
   const btn = document.getElementById('autoPlayBtn');
   if (btn) {
@@ -823,9 +903,7 @@ async function autoPlay() {
   document.getElementById('autoPlayIcon').textContent = '⏹';
   document.getElementById('autoPlayLabel').textContent = '停止';
 
-  // 播放時讓「下一步」按鈕可使用（auto 模式可跳過，manual 模式必須點）
-  const nextBtn = document.getElementById('stepNextBtn');
-  if (nextBtn) nextBtn.classList.remove('hidden');
+  _gateHistory.length = 0; _historyBrowseIdx = -1;
 
   ['playFlashSaleBtn', 'playVoucherBtn'].forEach(id => {
     const b = document.getElementById(id);
@@ -868,14 +946,12 @@ async function autoPlay() {
   } finally {
     isPlaying = false;
     stopRequested = false;
-    _stepResolve = null;
+    _stepResolve = null; _cancelAutoAdvance = null;
     spotlightOff();
     btn.classList.remove('playing');
     document.getElementById('autoPlayIcon').textContent = '▶';
     document.getElementById('autoPlayLabel').textContent = '再播一次';
-
-    const nextBtn = document.getElementById('stepNextBtn');
-    if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('waiting'); }
+    _hideStepBtns();
 
     ['playFlashSaleBtn', 'playVoucherBtn'].forEach(id => {
       const b = document.getElementById(id);
@@ -900,8 +976,7 @@ async function playFlashSaleDemo() {
   const playBtn = document.getElementById('playFlashSaleBtn');
   if (playBtn) { playBtn.disabled = true; playBtn.textContent = '⏸ 播放中...'; }
 
-  const nextBtn = document.getElementById('stepNextBtn');
-  if (nextBtn) nextBtn.classList.remove('hidden');
+  _gateHistory.length = 0; _historyBrowseIdx = -1;
 
   try {
     await _runFlashDemoAnimation();
@@ -913,9 +988,9 @@ async function playFlashSaleDemo() {
   } finally {
     flashPlaying = false;
     stopRequested = false;
-    _stepResolve = null;
+    _stepResolve = null; _cancelAutoAdvance = null;
     spotlightOff();
-    if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('waiting'); }
+    _hideStepBtns();
     if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶ 再播一次'; }
   }
 }
@@ -962,8 +1037,7 @@ async function playVoucherDemo() {
   const playBtn = document.getElementById('playVoucherBtn');
   if (playBtn) { playBtn.disabled = true; playBtn.textContent = '⏸ 播放中...'; }
 
-  const nextBtn = document.getElementById('stepNextBtn');
-  if (nextBtn) nextBtn.classList.remove('hidden');
+  _gateHistory.length = 0; _historyBrowseIdx = -1;
 
   try {
     await _runVoucherDemoAnimation();
@@ -975,9 +1049,9 @@ async function playVoucherDemo() {
   } finally {
     voucherPlaying = false;
     stopRequested = false;
-    _stepResolve = null;
+    _stepResolve = null; _cancelAutoAdvance = null;
     spotlightOff();
-    if (nextBtn) { nextBtn.classList.add('hidden'); nextBtn.classList.remove('waiting'); }
+    _hideStepBtns();
     if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶ 再播一次'; }
   }
 }
@@ -1049,14 +1123,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('resetBtn').addEventListener('click', resetDemo);
 
-  // ── 下一步按鈕 ──
-  document.getElementById('stepNextBtn')?.addEventListener('click', advanceStep);
+  // ── 上一步 / 下一步 ──
+  document.getElementById('stepPrevBtn')?.addEventListener('click', prevStep);
+  document.getElementById('stepNextBtn')?.addEventListener('click', () => {
+    // auto-playing 模式下按鈕是「⏸ 暫停」
+    const btn = document.getElementById('stepNextBtn');
+    if (btn && btn.classList.contains('auto-playing')) { pauseAutoPlay(); return; }
+    advanceStep();
+  });
 
-  // ── 自動播放 checkbox — 切換時立即反映（若正在等 gate，切換後下次 gate 生效）──
+  // ── 自動播放 checkbox ──
   document.getElementById('autoPlayCheck')?.addEventListener('change', () => {
-    // 若正在 manual 等待而用戶切回 auto → 立刻推進一步
     const check = document.getElementById('autoPlayCheck');
-    if (check && check.checked && _stepResolve) advanceStep();
+    if (!_stepResolve) return; // 沒在 gate 等待，不用處理
+    if (check && check.checked) {
+      // 切回自動：設定計時器
+      _updateStepBarControls(true);
+      const timeout = setTimeout(() => { if (_stepResolve) _stepResolve(); }, AUTO_STEP_DELAY);
+      _cancelAutoAdvance = () => clearTimeout(timeout);
+    } else {
+      // 切成手動：取消計時
+      if (_cancelAutoAdvance) { _cancelAutoAdvance(); _cancelAutoAdvance = null; }
+      _historyBrowseIdx = -1; // 回到最新
+      _updateStepBarControls(false);
+    }
   });
 
   // ── 廣告管理手動按鈕 ──
