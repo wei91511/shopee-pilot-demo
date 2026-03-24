@@ -162,6 +162,19 @@
     .g-toc a { display: block; color: var(--text-sec); text-decoration: none; padding: 2px 0; transition: color 0.15s; }
     .g-toc a:hover { color: var(--shopee); }
 
+    /* ── Top Warning ── */
+    .g-top-warning {
+      margin-bottom: 28px;
+      padding: 14px 18px;
+      background: #1f1500;
+      border: 1.5px solid #b45309;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #fde68a;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
     /* ── Footer ── */
     .g-footer { text-align: center; padding: 16px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px; }
 
@@ -204,6 +217,11 @@
 
   <!-- Main -->
   <main class="g-wrap">
+
+    <!-- 頂部提醒框 -->
+    <div class="g-top-warning">
+      ⚠️ 重要提醒：本工具為輔助性質，所有自動化操作的結果請務必人工確認後再送出。開發者不對操作結果負責。
+    </div>
 
     <!-- ============================
          一、安裝教學
@@ -514,7 +532,7 @@
     <!-- ── Bottom CTA ── -->
     <div class="g-bottom">
       <h3>準備好開始了嗎？</h3>
-      <p>如需協助請聯繫您的業務窗口</p>
+      <p>安裝後自動獲得 7 天完整功能體驗</p>
       <div class="g-bottom-btns">
         <a href="#" class="g-btn g-btn-primary">🚀 立即安裝</a>
         <a href="index.html" class="g-btn g-btn-secondary">← 返回 Demo</a>

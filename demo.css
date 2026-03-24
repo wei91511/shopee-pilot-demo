@@ -479,6 +479,19 @@ body.spotlight-active .spotlight-target {
   .ctrl-cta { display: none; }
 }
 
+/* ===== Demo 免責聲明小區塊 ===== */
+.demo-disclaimer {
+  text-align: center;
+  padding: 10px 20px;
+  background: var(--bg-main);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.demo-disclaimer-link { color: var(--text-muted); text-decoration: underline; }
+.demo-disclaimer-link:hover { color: var(--text-sec); }
+
 /* ===== Footer ===== */
 .page-footer { text-align: center; padding: 12px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
 
