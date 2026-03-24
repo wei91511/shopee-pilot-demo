@@ -404,6 +404,81 @@ body.spotlight-active .spotlight-target {
 .tg-content strong { color: white; }
 @keyframes popIn { 0% { opacity: 0; transform: scale(0.85) translateY(8px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
+/* ===== CTA 區塊 ===== */
+.cta-section {
+  margin-top: 0;
+  padding: 56px 20px;
+  background: linear-gradient(135deg, #0f1a2e 0%, #16213e 50%, #0f1a2e 100%);
+  border-top: 1px solid rgba(238,77,45,0.3);
+  border-bottom: 1px solid rgba(238,77,45,0.3);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(238,77,45,0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-inner { max-width: 600px; margin: 0 auto; position: relative; }
+.cta-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+}
+.cta-sub {
+  font-size: 15px;
+  color: var(--text-sec);
+  margin-bottom: 28px;
+}
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cta-install {
+  background: var(--shopee);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(238,77,45,0.4);
+}
+.cta-install:hover { background: var(--shopee-dk); box-shadow: 0 6px 28px rgba(238,77,45,0.5); transform: translateY(-1px); }
+.cta-note { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+/* Header CTA 小按鈕 */
+.ctrl-cta {
+  background: transparent;
+  color: var(--shopee);
+  border: 1.5px solid var(--shopee);
+  text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  padding: 6px 13px; border-radius: 8px;
+  transition: all 0.2s;
+  display: flex; align-items: center;
+}
+.ctrl-cta:hover { background: rgba(238,77,45,0.1); }
+
+/* Footer guide link */
+.footer-guide-link { color: var(--text-sec); text-decoration: none; }
+.footer-guide-link:hover { color: var(--text); text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .cta-section { padding: 40px 16px; }
+  .cta-title { font-size: 22px; }
+  .cta-sub { font-size: 14px; }
+  .cta-btn { padding: 13px 24px; font-size: 14px; }
+  .ctrl-cta { display: none; }
+}
+
 /* ===== Footer ===== */
 .page-footer { text-align: center; padding: 12px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
 

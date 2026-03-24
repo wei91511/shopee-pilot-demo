@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>運營工具箱 — 使用手冊</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-main:   #1a1a2e;
+      --bg-card:   #16213e;
+      --bg-card2:  #0f3460;
+      --border:    #2a2a4a;
+      --text:      #e0e0e0;
+      --text-sec:  #b0b0b0;
+      --text-muted:#888;
+      --shopee:    #ee4d2d;
+      --shopee-dk: #c73d20;
+      --accent:    #ff6b35;
+      --success:   #34c759;
+      --warn:      #f59e0b;
+      --info:      #2196f3;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg-main);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    .g-header {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      border-bottom: 2px solid var(--shopee);
+      padding: 18px 24px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .g-header-inner {
+      max-width: 860px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .g-brand { display: flex; align-items: center; gap: 12px; }
+    .g-logo { font-size: 26px; filter: drop-shadow(0 0 8px rgba(238,77,45,0.7)); }
+    .g-header h1 { font-size: 17px; font-weight: 700; color: #fff; }
+    .g-header-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .g-back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 8px;
+      background: transparent; border: 1.5px solid var(--border);
+      color: var(--text-sec); font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s; cursor: pointer;
+    }
+    .g-back-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* ── Main Layout ── */
+    .g-wrap { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+    /* ── Section ── */
+    .g-section { margin-bottom: 40px; }
+    .g-section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(238,77,45,0.3);
+    }
+    .g-section-icon { font-size: 22px; }
+    .g-section-title { font-size: 19px; font-weight: 700; color: #fff; }
+    .g-section-num {
+      font-size: 11px; font-weight: 700; color: var(--shopee);
+      background: rgba(238,77,45,0.12); padding: 2px 7px; border-radius: 10px;
+      border: 1px solid rgba(238,77,45,0.3);
+    }
+
+    /* ── Steps ── */
+    .g-steps { display: flex; flex-direction: column; gap: 10px; }
+    .g-step {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 13px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      transition: border-color 0.2s;
+    }
+    .g-step:hover { border-color: rgba(238,77,45,0.3); }
+    .g-step-num {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(238,77,45,0.15); border: 1px solid rgba(238,77,45,0.3);
+      font-size: 12px; font-weight: 700; color: var(--shopee);
+    }
+    .g-step-body { flex: 1; }
+    .g-step-text { font-size: 14px; color: var(--text); line-height: 1.55; }
+    .g-step-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .g-step-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+      vertical-align: middle; margin-left: 6px;
+    }
+    .badge-free  { background: #1b3a1b; color: #86efac; border: 1px solid #2e7d32; }
+    .badge-pro   { background: #312107; color: #fde68a; border: 1px solid #92400e; }
+    .badge-tip   { background: #0d2137; color: #93c5fd; border: 1px solid #1e40af; }
+
+    /* ── Info Box ── */
+    .g-info-box {
+      margin-top: 14px; padding: 13px 16px;
+      background: #0d1f35; border: 1px solid #1e3a5f;
+      border-radius: 8px; font-size: 13px; color: var(--text-sec);
+      line-height: 1.7;
+    }
+    .g-info-box .g-info-title { font-weight: 700; color: var(--info); margin-bottom: 5px; font-size: 12px; }
+    .g-info-box ul { padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+
+    /* ── Warning Box ── */
+    .g-warn-box {
+      margin-top: 14px; padding: 12px 16px;
+      background: #1f1700; border: 1px solid #78350f;
+      border-radius: 8px; font-size: 13px; color: #fde68a;
+      line-height: 1.65;
+    }
+
+    /* ── Divider ── */
+    .g-divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+    /* ── Bottom CTA ── */
+    .g-bottom {
+      text-align: center; padding: 40px 20px;
+      background: linear-gradient(135deg, #0f1a2e 0%, #16213e 100%);
+      border: 1px solid rgba(238,77,45,0.25);
+      border-radius: 14px;
+      position: relative; overflow: hidden;
+    }
+    .g-bottom::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(238,77,45,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .g-bottom h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; position: relative; }
+    .g-bottom p  { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; position: relative; }
+    .g-bottom-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
+    .g-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 11px 24px; border-radius: 9px;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none; cursor: pointer;
+      border: none; transition: all 0.2s;
+    }
+    .g-btn-primary { background: var(--shopee); color: #fff; box-shadow: 0 4px 14px rgba(238,77,45,0.35); }
+    .g-btn-primary:hover { background: var(--shopee-dk); transform: translateY(-1px); }
+    .g-btn-secondary { background: var(--bg-card); color: var(--text-sec); border: 1.5px solid var(--border); }
+    .g-btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* ── TOC Sidebar (optional) ── */
+    .g-toc {
+      position: sticky; top: 72px; float: right;
+      width: 180px; margin: 0 0 20px 24px;
+      padding: 14px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 9px;
+      font-size: 12px; line-height: 1.7;
+    }
+    .g-toc-title { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 9px; }
+    .g-toc a { display: block; color: var(--text-sec); text-decoration: none; padding: 2px 0; transition: color 0.15s; }
+    .g-toc a:hover { color: var(--shopee); }
+
+    /* ── Footer ── */
+    .g-footer { text-align: center; padding: 16px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px; }
+
+    @media (max-width: 720px) {
+      .g-toc { display: none; }
+      .g-wrap { padding: 20px 14px 50px; }
+      .g-section-title { font-size: 17px; }
+      .g-step-text { font-size: 13px; }
+      .g-bottom { padding: 28px 14px; }
+      .g-btn { padding: 10px 18px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="g-header">
+    <div class="g-header-inner">
+      <div class="g-brand">
+        <span class="g-logo">🛒</span>
+        <div>
+          <h1>運營工具箱</h1>
+          <p class="g-header-sub">使用手冊</p>
+        </div>
+      </div>
+      <a href="index.html" class="g-back-btn">← 返回 Demo</a>
+    </div>
+  </header>
+
+  <!-- TOC（桌面版浮動） -->
+  <div class="g-toc">
+    <div class="g-toc-title">目錄</div>
+    <a href="#install">一、安裝教學</a>
+    <a href="#ad">二、廣告管理</a>
+    <a href="#flash">三、限時特賣</a>
+    <a href="#voucher">四、優惠券</a>
+    <a href="#telegram">五、Telegram 遙控</a>
+    <a href="#serial">六、序號升級</a>
+  </div>
+
+  <!-- Main -->
+  <main class="g-wrap">
+
+    <!-- ============================
+         一、安裝教學
+         ============================ -->
+    <section class="g-section" id="install">
+      <div class="g-section-header">
+        <span class="g-section-icon">📦</span>
+        <h2 class="g-section-title">安裝教學</h2>
+        <span class="g-section-num">一</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">前往 Chrome 線上應用程式商店，點擊「加到 Chrome」安裝擴充功能</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">安裝完成後，瀏覽器右上角出現 🛒 工具箱圖示</div>
+            <div class="g-step-note">若未顯示，點擊擴充功能拼圖圖示 → 找到「運營工具箱」→ 固定到工具列</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">前往蝦皮賣家中心 <code style="font-family:monospace;color:var(--shopee);font-size:12px;">seller.shopee.tw</code></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">點擊工具箱圖示，右側出現側邊面板</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">5</div>
+          <div class="g-step-body">
+            <div class="g-step-text">點擊「使用 Google 帳號登入」，完成授權</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">6</div>
+          <div class="g-step-body">
+            <div class="g-step-text">登入後自動獲得 <strong style="color:var(--success);">7 天完整功能試用</strong><span class="g-step-badge badge-free">免費</span></div>
+            <div class="g-step-note">試用期間廣告管理、限時特賣、優惠券功能全開放</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="g-divider"></div>
+
+    <!-- ============================
+         二、廣告管理
+         ============================ -->
+    <section class="g-section" id="ad">
+      <div class="g-section-header">
+        <span class="g-section-icon">📊</span>
+        <h2 class="g-section-title">廣告管理</h2>
+        <span class="g-section-num">二</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">進入廣告管理頁面後，點擊 ⚙️ 設定圖示 → 設定調整規則</div>
+            <div class="g-step-note">可設定觸發條件（餘額低於 N 元）、ROAS 門檻、點擊率門檻，以及各條件的加碼金額</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">🔍 點擊「掃描廣告」— 自動讀取當前廣告數據並計算調整方案</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">確認掃描結果後，點擊「執行調整」— 預算自動更新</div>
+            <div class="g-step-note">執行中可隨時點擊「🛑 緊急停止」中斷操作</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">執行完成後，已設定 Telegram 的用戶將自動收到推播報告<span class="g-step-badge badge-tip">選用</span></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">5</div>
+          <div class="g-step-body">
+            <div class="g-step-text">⏰ 排程設定：勾選執行分鐘（可多選）、設定開始/結束時段，開啟排程開關後儲存</div>
+            <div class="g-step-note">到達排程時間後自動執行掃描 + 調整，完全不需要人在電腦前</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">6</div>
+          <div class="g-step-body">
+            <div class="g-step-text">🔄 預算重置：系統自動選出最佳廣告維持預算，其餘廣告重置為初始值</div>
+            <div class="g-step-note">適合每日固定預算的賣家，搭配隔天排程自動重新調整</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="g-divider"></div>
+
+    <!-- ============================
+         三、限時特賣
+         ============================ -->
+    <section class="g-section" id="flash">
+      <div class="g-section-header">
+        <span class="g-section-icon">🏷️</span>
+        <h2 class="g-section-title">限時特賣</h2>
+        <span class="g-section-num">三</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">在蝦皮賣家中心進入「行銷中心 → 限時特賣 → 設定商品」頁面</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">切換到工具箱側邊面板的「🏷️ 限時特賣」Tab</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">選擇庫存計算方式</div>
+            <div class="g-step-note">
+              「庫存除以 N」— 例如設 2，現有庫存 ÷ 2 無條件進位<br>
+              「統一數量」— 所有商品規格設為固定庫存數
+            </div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">🔍 點擊「預覽變更」— 確認每個商品規格的修改前後對比</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">5</div>
+          <div class="g-step-body">
+            <div class="g-step-text">確認無誤後點擊「🚀 執行修改」— 逐一更新蝦皮後台活動庫存</div>
+          </div>
+        </div>
+      </div>
+      <div class="g-info-box">
+        <div class="g-info-title">⚠️ 防呆規則</div>
+        <ul>
+          <li>活動庫存範圍：1 ~ 99</li>
+          <li>不得超過商品現有庫存數量</li>
+          <li>庫存為 0 的規格自動跳過</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="g-divider"></div>
+
+    <!-- ============================
+         四、優惠券
+         ============================ -->
+    <section class="g-section" id="voucher">
+      <div class="g-section-header">
+        <span class="g-section-icon">🎫</span>
+        <h2 class="g-section-title">優惠券</h2>
+        <span class="g-section-num">四</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">在蝦皮賣家中心進入「行銷中心 → 優惠券 → 建立優惠券」頁面</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">切換到工具箱側邊面板的「🎫 優惠券」Tab</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">從範本清單選擇折扣設定，點擊 ✓ 套用範本</div>
+            <div class="g-step-note">可新增、刪除、置頂自訂範本，下次直接一鍵套用</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">設定優惠券使用期間（格式：yyyymmddhhmm）</div>
+            <div class="g-step-note">例如 202604010000 = 2026/04/01 00:00</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">5</div>
+          <div class="g-step-body">
+            <div class="g-step-text">勾選「自動生成代碼」，工具箱自動產生 5 碼英數字優惠代碼</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">6</div>
+          <div class="g-step-body">
+            <div class="g-step-text">🚀 點擊「快速填入」— 自動完成蝦皮後台所有欄位（名稱、代碼、期間、折扣、最低消費）</div>
+            <div class="g-step-note">確認表單內容後點擊蝦皮的「送出」即完成建立</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="g-divider"></div>
+
+    <!-- ============================
+         五、Telegram 遙控
+         ============================ -->
+    <section class="g-section" id="telegram">
+      <div class="g-section-header">
+        <span class="g-section-icon">📱</span>
+        <h2 class="g-section-title">Telegram 遙控</h2>
+        <span class="g-section-num">五</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">前往 Telegram 搜尋 <code style="font-family:monospace;color:var(--shopee);font-size:12px;">@BotFather</code>，輸入 /newbot 建立一個新 Bot，取得 Bot Token</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">取得 Chat ID：向 Bot 傳送任意訊息，再開啟 <code style="font-family:monospace;color:var(--shopee);font-size:12px;">getUpdates</code> API 查詢</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">在工具箱 ⚙️ 設定面板填入 Bot Token 和 Chat ID，開啟「TG 推播」開關</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">設定完成後，每次排程自動執行或手動執行完成，Telegram 會自動發送調整結果報告</div>
+          </div>
+        </div>
+      </div>
+      <div class="g-warn-box">
+        💡 可點擊各功能頁面的「📤 測試推播」按鈕，確認 Telegram 設定是否正確
+      </div>
+    </section>
+
+    <div class="g-divider"></div>
+
+    <!-- ============================
+         六、序號升級
+         ============================ -->
+    <section class="g-section" id="serial">
+      <div class="g-section-header">
+        <span class="g-section-icon">🔑</span>
+        <h2 class="g-section-title">序號升級</h2>
+        <span class="g-section-num">六</span>
+      </div>
+      <div class="g-steps">
+        <div class="g-step">
+          <div class="g-step-num">1</div>
+          <div class="g-step-body">
+            <div class="g-step-text">7 天試用到期後，功能將限制為免費版（廣告掃描可繼續使用）</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">2</div>
+          <div class="g-step-body">
+            <div class="g-step-text">如需繼續使用完整功能，請聯繫您的業務窗口取得序號<span class="g-step-badge badge-pro">標準版</span></div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">3</div>
+          <div class="g-step-body">
+            <div class="g-step-text">在側邊面板點擊授權狀態列旁的「🔑 升級」按鈕</div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-step-num">4</div>
+          <div class="g-step-body">
+            <div class="g-step-text">輸入序號後點擊「兌換」— 系統自動升級為標準版，立即生效</div>
+          </div>
+        </div>
+      </div>
+      <div class="g-info-box">
+        <div class="g-info-title">📋 方案說明</div>
+        <ul>
+          <li>試用版：7 天完整功能體驗（登入後自動獲得）</li>
+          <li>標準版：長期使用，支援最多 N 個賣場綁定</li>
+          <li>如需更多賣場配額，請聯繫業務窗口調整</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── Bottom CTA ── -->
+    <div class="g-bottom">
+      <h3>準備好開始了嗎？</h3>
+      <p>如需協助請聯繫您的業務窗口</p>
+      <div class="g-bottom-btns">
+        <a href="#" class="g-btn g-btn-primary">🚀 立即安裝</a>
+        <a href="index.html" class="g-btn g-btn-secondary">← 返回 Demo</a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="g-footer">
+    運營工具箱 © 2026 ｜ 使用手冊
+  </footer>
+
+</body>
+</html>
