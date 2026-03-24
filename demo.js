@@ -814,7 +814,6 @@ async function autoPlay() {
     stopRequested = false;
     isPaused = false; _resumeResolve = null;
     spotlightOff();
-    btn.classList.remove('hidden');
     if (pauseBtn) pauseBtn.classList.add('hidden');
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) { resetBtn.textContent = '▶ 重新播放'; }
@@ -970,7 +969,7 @@ function switchSpTab(id) {
 // ========================
 //  初始化
 // ========================
-document.addEventListener('DOMContentLoaded', () => {
+function _initDemo() {
   document.getElementById('spage-ad').classList.add('active');
 
   // ── 頁面載入後 1 秒自動播放 ──
@@ -1066,7 +1065,10 @@ document.addEventListener('DOMContentLoaded', () => {
       addLog('排程', isOn ? '排程已啟用' : '排程已停用');
     });
   }
-});
+}
+
+// demo.js 在 body 底部同步執行，DOM 已 ready，直接呼叫
+_initDemo();
 
 // ===== 橫向提示 =====
 (function () {
