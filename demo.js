@@ -747,14 +747,9 @@ function resetDemo() {
   isPaused = false; _resumeResolve = null;
   spotlightOff();
   document.getElementById('pauseBtn')?.classList.add('hidden');
-  document.getElementById('autoPlayBtn')?.classList.remove('hidden');
 
-  const btn = document.getElementById('autoPlayBtn');
-  if (btn) {
-    btn.classList.remove('playing');
-    document.getElementById('autoPlayIcon').textContent = '▶';
-    document.getElementById('autoPlayLabel').textContent = '三Tab連播';
-  }
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) { resetBtn.textContent = '↺ 重置'; }
 
   setStep('');
   resetAdDemo();
@@ -820,9 +815,9 @@ async function autoPlay() {
     isPaused = false; _resumeResolve = null;
     spotlightOff();
     btn.classList.remove('hidden');
-    document.getElementById('autoPlayIcon').textContent = '▶';
-    document.getElementById('autoPlayLabel').textContent = '再播一次';
     if (pauseBtn) pauseBtn.classList.add('hidden');
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) { resetBtn.textContent = '▶ 重新播放'; }
 
     ['playFlashSaleBtn', 'playVoucherBtn'].forEach(id => {
       const b = document.getElementById(id);
@@ -977,25 +972,25 @@ function switchSpTab(id) {
 // ========================
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('spage-ad').classList.add('active');
-  document.getElementById('autoPlayLabel').textContent = '自動播放';
 
-  // ── 開場高亮（引導用戶點播放）──
-  const autoPlayBtn = document.getElementById('autoPlayBtn');
-  autoPlayBtn.classList.add('ctrl-btn-attention');
-
-  // ── 自動播放按鈕 ──
-  autoPlayBtn.addEventListener('click', () => {
-    autoPlayBtn.classList.remove('ctrl-btn-attention');
-    resetDemo();
-    setTimeout(autoPlay, 67);
-  });
+  // ── 頁面載入後 1 秒自動播放 ──
+  setTimeout(() => { resetDemo(); setTimeout(autoPlay, 67); }, 1000);
 
   // ── 暫停 / 繼續 toggle ──
   document.getElementById('pauseBtn')?.addEventListener('click', () => {
     if (isPaused) resumeDemo(); else pauseDemo();
   });
 
-  document.getElementById('resetBtn').addEventListener('click', resetDemo);
+  // ── 重置 / 重新播放 ──
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    const btn = document.getElementById('resetBtn');
+    if (btn && btn.textContent.includes('重新播放')) {
+      resetDemo();
+      setTimeout(autoPlay, 67);
+    } else {
+      resetDemo();
+    }
+  });
 
   // ── 廣告管理手動按鈕 ──
   const scanBtn = document.getElementById('scanBtn');
