@@ -60,7 +60,7 @@ async function safeDelay(ms) {
   if (stopRequested) throw new Error('STOP');
 }
 
-const AUTO_STEP_DELAY = 3000;
+const AUTO_STEP_DELAY = 6000;
 async function stepGate() { await safeDelay(AUTO_STEP_DELAY); }
 
 function pauseDemo() {
@@ -122,7 +122,7 @@ function highlight(el) {
   el.classList.remove('highlight-pulse');
   void el.offsetWidth;
   el.classList.add('highlight-pulse');
-  setTimeout(() => el.classList.remove('highlight-pulse'), 1250);
+  setTimeout(() => el.classList.remove('highlight-pulse'), 2500);
 }
 
 function addLog(action, detail) {
@@ -138,7 +138,7 @@ function addLog(action, detail) {
   log.insertBefore(item, log.firstChild);
 }
 
-async function typeInto(el, text, msPerChar = 25) {
+async function typeInto(el, text, msPerChar = 50) {
   if (!el) return;
   el.textContent = '';
   el.classList.add('filling');
@@ -148,7 +148,7 @@ async function typeInto(el, text, msPerChar = 25) {
   }
   el.classList.remove('filling');
   el.classList.add('filled');
-  setTimeout(() => el.classList.remove('filled'), 400);
+  setTimeout(() => el.classList.remove('filled'), 800);
 }
 
 async function genCodeAnimation(el) {
@@ -157,7 +157,7 @@ async function genCodeAnimation(el) {
   el.classList.add('generating');
   for (let i = 0; i < 12; i++) {
     el.textContent = Array.from({length: 5}, rndChar).join('');
-    await delay(32);
+    await delay(65);
   }
   const code = Array.from({length: 5}, rndChar).join('');
   el.textContent = code;
@@ -238,12 +238,12 @@ async function runScan() {
       p = Math.min(p + 3, target);
       if (fill) fill.style.width = p + '%';
       if (pct) pct.textContent = p + '%';
-      await delay(20);
+      await delay(40);   // 25 → 40
     }
-    if (p < 100) await delay(250);
+    if (p < 100) await delay(500);  // 280 → 500
   }
 
-  await delay(250);
+  await delay(500);  // 300 → 500
   if (progress) progress.classList.add('hidden');
   if (fill) fill.style.width = '0%';
   if (pct) pct.textContent = '';
@@ -300,20 +300,20 @@ async function runExecute() {
     const row = document.querySelector(`tr[data-id="${ad.id}"]`);
     if (row) {
       row.classList.add('s-adjusting');
-      await delay(400);
+      await delay(800);   // 380 → 800
       const cell = row.querySelector('.s-budget');
       if (cell) {
         cell.textContent = `$${ad.newBudget}`;
         cell.classList.add('updated');
-        setTimeout(() => cell.classList.remove('updated'), 350);
+        setTimeout(() => cell.classList.remove('updated'), 700);
       }
       row.classList.remove('s-adjusting');
       row.classList.add('s-done');
     }
-    await delay(250);
+    await delay(500);   // 280 → 500
   }
 
-  await delay(250);
+  await delay(500);  // 300 → 500
   if (progress) progress.classList.add('hidden');
   if (fill) fill.style.width = '0%';
 
@@ -342,7 +342,7 @@ async function runExecute() {
     lastRun.textContent = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${h >= 12 ? '下午' : '上午'}${h > 12 ? h-12 : h}:${String(now.getMinutes()).padStart(2,'0')}`;
   }
 
-  await delay(400);
+  await delay(800);   // 500 → 800
   showTelegramNotification(adjs);
 
   if (scanBtn) scanBtn.disabled = false;
@@ -374,19 +374,19 @@ async function runResetBudget() {
     if (row) {
       row.classList.remove('s-done');
       row.classList.add('s-adjusting');
-      await safeDelay(300);
+      await safeDelay(600);
       const cell = row.querySelector('.s-budget');
       if (cell) {
         cell.textContent = `$${budget}`;
         cell.classList.add('updated');
-        setTimeout(() => cell.classList.remove('updated'), 400);
+        setTimeout(() => cell.classList.remove('updated'), 800);
       }
       row.classList.remove('s-adjusting');
     }
-    await safeDelay(200);
+    await safeDelay(400);
   }
 
-  await delay(200);
+  await delay(400);
   if (progress) progress.classList.add('hidden');
   if (fill) fill.style.width = '0%';
 
@@ -445,7 +445,7 @@ async function _runAdDemoAnimation() {
   spotlightOff();
   switchFtab('ad');
   switchSpTab('ad');
-  await safeDelay(300);
+  await safeDelay(600);
 
   // === 功能簡介字幕 ===
   await showSubtitles([
@@ -460,7 +460,7 @@ async function _runAdDemoAnimation() {
   const rulesCard = document.getElementById('spRulesCard');
   if (rulesCard) {
     rulesCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    await safeDelay(250);
+    await safeDelay(500);
     highlight(rulesCard);
   }
   await stepGate();
@@ -470,7 +470,7 @@ async function _runAdDemoAnimation() {
   const schedCard = document.getElementById('spScheduleCard');
   if (schedCard) {
     schedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    await safeDelay(250);
+    await safeDelay(500);
     highlight(schedCard);
   }
   await stepGate();
@@ -482,17 +482,17 @@ async function _runAdDemoAnimation() {
   if (countdown) countdown.classList.remove('hidden');
   for (let s = 3; s >= 0; s--) {
     if (timeEl) timeEl.textContent = `00:0${s}`;
-    await safeDelay(s === 3 ? 500 : 450);
+    await safeDelay(s === 3 ? 1000 : 900);
   }
   if (countdown) countdown.classList.add('hidden');
-  await safeDelay(200);
+  await safeDelay(400);
 
   // === 掃描 ===
   setStep('🔍 自動掃描廣告數據，計算調整方案...');
   spotlight(spFrame);
   const scanBtnEl = document.getElementById('scanBtn');
   if (scanBtnEl) scanBtnEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  await safeDelay(300);
+  await safeDelay(600);
   await runScan();
   await stepGate();
 
@@ -502,37 +502,12 @@ async function _runAdDemoAnimation() {
   spotlightBoth();
   setStep('⚡ 執行調整 — 可隨時按「緊急停止」中斷');
   highlight(document.getElementById('executeBtn'));
-  await safeDelay(900);
+  await safeDelay(1800);
   await runExecute();
   if (stopBtn) stopBtn.classList.add('hidden');
   await stepGate();
 
-  // === TG 推播 ===
   spotlightOff();
-  setStep('📱 調整完成，Telegram 自動發送報告');
-  const tgWrap = document.getElementById('tgWrap');
-  if (tgWrap) tgWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  await stepGate();
-
-  // === 預算重置演示 ===
-  setStep('🔄 預算重置 — 選出最佳廣告維持，其他歸零隔天重跑');
-  spotlight(spFrame);
-  const adResetBtn = document.getElementById('adResetBtn');
-  if (adResetBtn) {
-    adResetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    await safeDelay(250);
-    highlight(adResetBtn);
-  }
-  await stepGate();
-
-  setStep('⚙️ 系統自動選出最佳廣告，其餘重置為基準預算...');
-  spotlightBoth();
-  await runResetBudget();
-  await stepGate();
-
-  spotlightOff();
-  setStep('📅 適合每日固定預算的賣家 — 隔天排程自動重新調整');
-  await stepGate();
 }
 
 // ========================
@@ -550,7 +525,7 @@ async function _runFlashDemoAnimation() {
   // === 選擇模式 ===
   setStep('🏷️ 選擇庫存設定方式 — 活動庫存 = 現有庫存 ÷ 2');
   spotlight(spFrame);
-  await safeDelay(200);
+  await safeDelay(400);
   highlight(document.getElementById('flashModeCard'));
   await stepGate();
 
@@ -583,7 +558,7 @@ async function _runFlashDemoAnimation() {
   // === 執行 ===
   setStep('🚀 點擊「執行修改」，蝦皮後台庫存即時更新');
   highlight(execBtn);
-  await safeDelay(750);
+  await safeDelay(1500);
 
   setStep('⚙️ 逐一更新活動庫存...');
   const progress = document.getElementById('flashProgress');
@@ -600,14 +575,14 @@ async function _runFlashDemoAnimation() {
     const row = document.getElementById(`f2-row-${item.idx}`);
     const stockCell = document.getElementById(`f2-stock-${item.idx}`);
     if (row) row.classList.add('s-adjusting');
-    await safeDelay(450);
+    await safeDelay(900);
     if (stockCell) {
       stockCell.textContent = Math.ceil(item.orig / 2);
       stockCell.classList.add('updated');
-      setTimeout(() => stockCell.classList.remove('updated'), 400);
+      setTimeout(() => stockCell.classList.remove('updated'), 800);
     }
     if (row) { row.classList.remove('s-adjusting'); row.classList.add('s-done'); }
-    await safeDelay(250);
+    await safeDelay(500);
   }
 
   if (progress) progress.classList.add('hidden');
@@ -670,17 +645,17 @@ async function _runVoucherDemoAnimation() {
   if (vStart) {
     vStart.value = '';
     vStart.classList.add('input-flash');
-    await safeDelay(150);
+    await safeDelay(300);
     vStart.value = '202604010000';
-    setTimeout(() => vStart.classList.remove('input-flash'), 350);
+    setTimeout(() => vStart.classList.remove('input-flash'), 700);
   }
-  await safeDelay(350);
+  await safeDelay(700);
   if (vEnd) {
     vEnd.value = '';
     vEnd.classList.add('input-flash');
-    await safeDelay(150);
+    await safeDelay(300);
     vEnd.value = '202604300000';
-    setTimeout(() => vEnd.classList.remove('input-flash'), 350);
+    setTimeout(() => vEnd.classList.remove('input-flash'), 700);
   }
   await stepGate();
 
@@ -695,20 +670,20 @@ async function _runVoucherDemoAnimation() {
   setStep('🚀 點擊「快速填入」— 自動填入蝦皮後台所有欄位');
   const fillBtn = document.getElementById('vFillBtn');
   if (fillBtn) highlight(fillBtn);
-  await safeDelay(600);
+  await safeDelay(1200);
 
   // === 蝦皮後台逐欄填入 ===
   setStep('✍️ 蝦皮後台表單逐欄自動填入...');
   spotlightBoth();
-  await typeInto(document.getElementById('v2-name'), VOUCHER_DEMO.name, 30);
-  await delay(250);
-  await typeInto(document.getElementById('v2-code'), generatedCode, 45);
-  await delay(250);
-  await typeInto(document.getElementById('v2-period'), '2026/04/01 00:00 至 2026/04/30 00:00', 14);
-  await delay(250);
-  await typeInto(document.getElementById('v2-discount'), `NT$${VOUCHER_DEMO.discount}`, 35);
-  await delay(250);
-  await typeInto(document.getElementById('v2-minimum'), `NT$${VOUCHER_DEMO.min}`, 35);
+  await typeInto(document.getElementById('v2-name'), VOUCHER_DEMO.name, 60);
+  await delay(500);
+  await typeInto(document.getElementById('v2-code'), generatedCode, 90);
+  await delay(500);
+  await typeInto(document.getElementById('v2-period'), '2026/04/01 00:00 至 2026/04/30 00:00', 28);
+  await delay(500);
+  await typeInto(document.getElementById('v2-discount'), `NT$${VOUCHER_DEMO.discount}`, 70);
+  await delay(500);
+  await typeInto(document.getElementById('v2-minimum'), `NT$${VOUCHER_DEMO.min}`, 70);
   spotlightOff();
   await stepGate();
 
@@ -810,21 +785,21 @@ async function autoPlay() {
     // ==== Tab 1: 廣告管理 ====
     resetAdDemo();
     await _runAdDemoAnimation();
-    await safeDelay(750);
+    await safeDelay(1500);   // 800 → 1500
 
     // ==== Tab 2: 限時特賣 ====
     resetFlashSaleDemo();
     switchFtab('flash');
-    await safeDelay(500);
+    await safeDelay(1000);   // 600 → 1000
     await _runFlashDemoAnimation();
-    await safeDelay(750);
+    await safeDelay(1500);
 
     // ==== Tab 3: 優惠券 ====
     resetVoucherDemo();
     switchFtab('voucher');
-    await safeDelay(500);
+    await safeDelay(1000);
     await _runVoucherDemoAnimation();
-    await safeDelay(750);
+    await safeDelay(1500);
 
     // ==== 結尾字幕 ====
     await showSubtitles([
@@ -1051,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (stopBtnEl) {
     stopBtnEl.addEventListener('click', () => {
       setStep('🛑 緊急停止已觸發！操作中止');
-      setTimeout(() => stopBtnEl.classList.add('hidden'), 700);
+      setTimeout(() => stopBtnEl.classList.add('hidden'), 1400);
     });
   }
 
