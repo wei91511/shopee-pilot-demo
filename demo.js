@@ -138,7 +138,7 @@ function addLog(action, detail) {
   log.insertBefore(item, log.firstChild);
 }
 
-async function typeInto(el, text, msPerChar = 17) {
+async function typeInto(el, text, msPerChar = 10) {
   if (!el) return;
   el.textContent = '';
   el.classList.add('filling');
@@ -155,9 +155,9 @@ async function genCodeAnimation(el) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const rndChar = () => chars[Math.floor(Math.random() * chars.length)];
   el.classList.add('generating');
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 5; i++) {
     el.textContent = Array.from({length: 5}, rndChar).join('');
-    await delay(22);
+    await delay(20);
   }
   const code = Array.from({length: 5}, rndChar).join('');
   el.textContent = code;
@@ -238,7 +238,7 @@ async function runScan() {
       p = Math.min(p + 3, target);
       if (fill) fill.style.width = p + '%';
       if (pct) pct.textContent = p + '%';
-      await delay(13);   // 25 → 40
+      await delay(5);
     }
     if (p < 100) await delay(167);  // 280 → 500
   }
@@ -300,17 +300,17 @@ async function runExecute() {
     const row = document.querySelector(`tr[data-id="${ad.id}"]`);
     if (row) {
       row.classList.add('s-adjusting');
-      await delay(267);   // 380 → 800
+      await delay(80);
       const cell = row.querySelector('.s-budget');
       if (cell) {
         cell.textContent = `$${ad.newBudget}`;
         cell.classList.add('updated');
-        setTimeout(() => cell.classList.remove('updated'), 233);
+        setTimeout(() => cell.classList.remove('updated'), 200);
       }
       row.classList.remove('s-adjusting');
       row.classList.add('s-done');
     }
-    await delay(167);   // 280 → 500
+    await delay(30);
   }
 
   await delay(167);  // 300 → 500
@@ -575,14 +575,14 @@ async function _runFlashDemoAnimation() {
     const row = document.getElementById(`f2-row-${item.idx}`);
     const stockCell = document.getElementById(`f2-stock-${item.idx}`);
     if (row) row.classList.add('s-adjusting');
-    await safeDelay(300);
+    await safeDelay(80);
     if (stockCell) {
       stockCell.textContent = Math.ceil(item.orig / 2);
       stockCell.classList.add('updated');
-      setTimeout(() => stockCell.classList.remove('updated'), 267);
+      setTimeout(() => stockCell.classList.remove('updated'), 200);
     }
     if (row) { row.classList.remove('s-adjusting'); row.classList.add('s-done'); }
-    await safeDelay(167);
+    await safeDelay(30);
   }
 
   if (progress) progress.classList.add('hidden');
@@ -675,15 +675,15 @@ async function _runVoucherDemoAnimation() {
   // === 蝦皮後台逐欄填入 ===
   setStep('✍️ 蝦皮後台表單逐欄自動填入...');
   spotlightBoth();
-  await typeInto(document.getElementById('v2-name'), VOUCHER_DEMO.name, 20);
-  await delay(167);
-  await typeInto(document.getElementById('v2-code'), generatedCode, 30);
-  await delay(167);
-  await typeInto(document.getElementById('v2-period'), '2026/04/01 00:00 至 2026/04/30 00:00', 9);
-  await delay(167);
-  await typeInto(document.getElementById('v2-discount'), `NT$${VOUCHER_DEMO.discount}`, 23);
-  await delay(167);
-  await typeInto(document.getElementById('v2-minimum'), `NT$${VOUCHER_DEMO.min}`, 23);
+  await typeInto(document.getElementById('v2-name'), VOUCHER_DEMO.name, 10);
+  await delay(200);
+  await typeInto(document.getElementById('v2-code'), generatedCode, 10);
+  await delay(200);
+  await typeInto(document.getElementById('v2-period'), '2026/04/01 00:00 至 2026/04/30 00:00', 10);
+  await delay(200);
+  await typeInto(document.getElementById('v2-discount'), `NT$${VOUCHER_DEMO.discount}`, 10);
+  await delay(200);
+  await typeInto(document.getElementById('v2-minimum'), `NT$${VOUCHER_DEMO.min}`, 10);
   spotlightOff();
   await stepGate();
 
