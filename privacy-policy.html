@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Shopee Seller Toolbox</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif;
+      background: #f8f9fa;
+      color: #1a1a2e;
+      line-height: 1.8;
+    }
+    header {
+      background: linear-gradient(135deg, #ee4d2d, #ff6b35);
+      color: #fff;
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    header p { font-size: 15px; opacity: 0.9; }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .lang-toggle {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .lang-btn {
+      padding: 8px 20px;
+      border: 2px solid #ee4d2d;
+      border-radius: 20px;
+      background: transparent;
+      color: #ee4d2d;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn.active, .lang-btn:hover {
+      background: #ee4d2d;
+      color: #fff;
+    }
+    .policy-section { display: none; }
+    .policy-section.active { display: block; }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ee4d2d;
+      margin: 36px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #ffe0d8;
+    }
+    h2:first-child { margin-top: 0; }
+    p { margin-bottom: 12px; font-size: 15px; color: #333; }
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { font-size: 15px; color: #333; margin-bottom: 6px; }
+    .updated {
+      display: inline-block;
+      background: #fff3f0;
+      border: 1px solid #ffd0c4;
+      color: #c0392b;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 8px;
+      margin-bottom: 28px;
+    }
+    .contact-box {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 16px;
+    }
+    .contact-box a { color: #ee4d2d; text-decoration: none; font-weight: 600; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      color: #999;
+      border-top: 1px solid #e0e0e0;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧰 運營工具箱 — Privacy Policy</h1>
+  <p>Shopee Seller Toolbox Chrome Extension</p>
+</header>
+
+<div class="container">
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="switchLang('zh')">繁體中文</button>
+    <button class="lang-btn" onclick="switchLang('en')">English</button>
+  </div>
+
+  <!-- 繁體中文 -->
+  <div class="policy-section active" id="policy-zh">
+    <div class="updated">最後更新：2026 年 3 月 24 日</div>
+
+    <h2>1. 收集的資料</h2>
+    <p>本擴充功能（運營工具箱 - 蝦皮賣家管理神器）在您使用時可能收集以下資料：</p>
+    <ul>
+      <li><strong>Google 帳號資訊</strong>：透過 Google OAuth 取得您的 Google ID、電子郵件地址與顯示名稱，用於識別授權身份。</li>
+      <li><strong>賣場識別碼（Shop ID）</strong>：從蝦皮賣家後台頁面讀取，用於授權綁定與功能解鎖。</li>
+      <li><strong>擴充功能設定</strong>：廣告調整規則、排程設定、Telegram Bot 資訊等，儲存於您的瀏覽器本地（chrome.storage.local），不上傳至伺服器。</li>
+      <li><strong>授權序號</strong>：您輸入的序號，用於核對授權資料庫。</li>
+    </ul>
+
+    <h2>2. 資料的使用方式</h2>
+    <p>收集的資料僅用於以下目的：</p>
+    <ul>
+      <li>驗證您的授權狀態（試用 / 標準版 / 免費版）</li>
+      <li>綁定賣場，防止試用帳號濫用</li>
+      <li>提供擴充功能的核心功能（廣告管理、限時特賣、優惠券等）</li>
+      <li>在功能執行後傳送 Telegram 通知（僅限您設定的 Bot 與 Chat ID）</li>
+    </ul>
+    <p>我們<strong>不會</strong>將您的個人資料出售、出租或分享給第三方廣告商。</p>
+
+    <h2>3. 資料儲存位置</h2>
+    <ul>
+      <li><strong>本地儲存</strong>：大部分設定（Telegram Token、排程設定、優惠券範本等）僅儲存於您的瀏覽器，不傳送至任何伺服器。</li>
+      <li><strong>雲端授權資料庫</strong>：Google ID、電子郵件、賣場 ID 及授權狀態儲存於 Supabase 雲端資料庫，用於多設備授權驗證。資料庫位於美國（AWS us-east-1）。</li>
+    </ul>
+
+    <h2>4. 資料保存期限</h2>
+    <p>授權資料將在您的授權有效期間內保留。若您要求刪除帳號資料，請透過下方聯絡方式與我們聯繫，我們將在 14 個工作天內完成刪除。</p>
+
+    <h2>5. 第三方服務</h2>
+    <ul>
+      <li><strong>Google OAuth</strong>：用於身份驗證。適用 Google 的隱私權政策。</li>
+      <li><strong>Supabase</strong>：用於授權資料儲存。適用 Supabase 的隱私權政策。</li>
+      <li><strong>Telegram</strong>：若您設定 Bot 推播，訊息將傳送至 Telegram 伺服器。適用 Telegram 的隱私權政策。</li>
+    </ul>
+    <p>本擴充功能不與蝦皮（Shopee）官方有任何關聯。</p>
+
+    <h2>6. 權限說明</h2>
+    <ul>
+      <li><strong>identity</strong>：取得 Google OAuth 登入 Token</li>
+      <li><strong>storage</strong>：儲存設定與授權狀態至本地</li>
+      <li><strong>tabs</strong>：偵測目前瀏覽的頁面 URL，判斷是否在賣家後台</li>
+      <li><strong>scripting</strong>：注入 Content Script 與頁面互動（填入表單、讀取廣告資料）</li>
+      <li><strong>alarms</strong>：設定排程執行廣告調整任務</li>
+      <li><strong>sidePanel</strong>：開啟 Side Panel 操作介面</li>
+    </ul>
+
+    <h2>7. 您的權利</h2>
+    <p>您可以隨時：</p>
+    <ul>
+      <li>登出並清除本地的 Google 登入資訊</li>
+      <li>在瀏覽器中移除擴充功能，所有本地資料將一併清除</li>
+      <li>聯絡我們要求刪除雲端授權資料</li>
+    </ul>
+
+    <h2>8. 隱私政策變更</h2>
+    <p>若本隱私政策有重大變更，將在此頁面更新並修改「最後更新日期」。建議定期查閱此頁面。</p>
+
+    <h2>9. 聯絡我們</h2>
+    <div class="contact-box">
+      <p>若您對本隱私政策有任何疑問或請求，請透過以下方式聯繫：</p>
+      <p>GitHub Issues：<a href="https://github.com/wei91511/shopee-pilot/issues" target="_blank">github.com/wei91511/shopee-pilot/issues</a></p>
+    </div>
+  </div>
+
+  <!-- English -->
+  <div class="policy-section" id="policy-en">
+    <div class="updated">Last Updated: March 24, 2026</div>
+
+    <h2>1. Data We Collect</h2>
+    <p>This extension (Shopee Seller Toolbox) may collect the following data when you use it:</p>
+    <ul>
+      <li><strong>Google Account Info</strong>: Via Google OAuth — your Google ID, email address, and display name, used to identify and verify your license.</li>
+      <li><strong>Shop ID</strong>: Read from the Shopee Seller Center page, used for license binding and feature unlocking.</li>
+      <li><strong>Extension Settings</strong>: Ad adjustment rules, schedule settings, Telegram Bot info, etc. — stored locally in your browser (chrome.storage.local) and never uploaded to any server.</li>
+      <li><strong>License Key</strong>: The serial code you enter, used to verify against the license database.</li>
+    </ul>
+
+    <h2>2. How We Use Your Data</h2>
+    <p>Data is used only for the following purposes:</p>
+    <ul>
+      <li>Verifying your license status (Trial / Standard / Free)</li>
+      <li>Binding your shop to prevent trial abuse</li>
+      <li>Providing core extension functionality (ad management, flash sales, vouchers, etc.)</li>
+      <li>Sending Telegram notifications after task execution (only to the Bot and Chat ID you configure)</li>
+    </ul>
+    <p>We <strong>do not</strong> sell, rent, or share your personal data with third-party advertisers.</p>
+
+    <h2>3. Where Data is Stored</h2>
+    <ul>
+      <li><strong>Local Storage</strong>: Most settings (Telegram Token, schedule settings, voucher templates, etc.) are stored only in your browser and never sent to any server.</li>
+      <li><strong>Cloud License Database</strong>: Your Google ID, email, Shop ID, and license status are stored in a Supabase cloud database for cross-device license verification. The database is hosted in the US (AWS us-east-1).</li>
+    </ul>
+
+    <h2>4. Data Retention</h2>
+    <p>License data is retained for the duration of your active license. To request deletion of your account data, contact us via the details below. We will complete deletion within 14 business days.</p>
+
+    <h2>5. Third-Party Services</h2>
+    <ul>
+      <li><strong>Google OAuth</strong>: Used for authentication. Subject to Google's Privacy Policy.</li>
+      <li><strong>Supabase</strong>: Used for license data storage. Subject to Supabase's Privacy Policy.</li>
+      <li><strong>Telegram</strong>: If you configure Bot notifications, messages are sent to Telegram's servers. Subject to Telegram's Privacy Policy.</li>
+    </ul>
+    <p>This extension is not affiliated with or endorsed by Shopee.</p>
+
+    <h2>6. Permissions Explained</h2>
+    <ul>
+      <li><strong>identity</strong>: Obtain Google OAuth login token</li>
+      <li><strong>storage</strong>: Save settings and license state locally</li>
+      <li><strong>tabs</strong>: Detect the current page URL to determine if you're on the Seller Center</li>
+      <li><strong>scripting</strong>: Inject content scripts to interact with pages (fill forms, read ad data)</li>
+      <li><strong>alarms</strong>: Schedule automatic ad adjustment tasks</li>
+      <li><strong>sidePanel</strong>: Open the Side Panel interface</li>
+    </ul>
+
+    <h2>7. Your Rights</h2>
+    <p>You may at any time:</p>
+    <ul>
+      <li>Sign out and clear your local Google login information</li>
+      <li>Remove the extension from your browser, which clears all local data</li>
+      <li>Contact us to request deletion of your cloud license data</li>
+    </ul>
+
+    <h2>8. Changes to This Policy</h2>
+    <p>If there are significant changes to this Privacy Policy, we will update this page and revise the "Last Updated" date. We recommend checking this page periodically.</p>
+
+    <h2>9. Contact Us</h2>
+    <div class="contact-box">
+      <p>If you have any questions or requests regarding this Privacy Policy, please contact us via:</p>
+      <p>GitHub Issues: <a href="https://github.com/wei91511/shopee-pilot/issues" target="_blank">github.com/wei91511/shopee-pilot/issues</a></p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 運營工具箱 — Shopee Seller Toolbox. All rights reserved.
+</footer>
+
+<script>
+  function switchLang(lang) {
+    document.querySelectorAll('.policy-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('policy-' + lang).classList.add('active');
+    document.querySelector(`[onclick="switchLang('${lang}')"]`).classList.add('active');
+  }
+</script>
+</body>
+</html>
