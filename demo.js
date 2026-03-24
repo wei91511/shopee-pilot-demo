@@ -60,7 +60,7 @@ async function safeDelay(ms) {
   if (stopRequested) throw new Error('STOP');
 }
 
-const AUTO_STEP_DELAY = 2000;
+const AUTO_STEP_DELAY = 1000;
 async function stepGate() { await safeDelay(AUTO_STEP_DELAY); }
 
 function pauseDemo() {
