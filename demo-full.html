@@ -462,17 +462,32 @@ body{font-family:'Noto Sans TC',-apple-system,sans-serif;font-size:13px;backgrou
           <button style="border:1px solid var(--or);color:var(--or);background:#fff;padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer">+ 新增商品</button>
         </div>
         <table class="t" id="flashTable">
-          <thead><tr>
-            <th style="width:30px"><input type="checkbox"></th>
-            <th>規格</th>
-            <th>原價</th>
-            <th>折扣後售價</th>
-            <th>折扣</th>
-            <th>活動庫存 ⓘ</th>
-            <th>購買限制 ⓘ</th>
-            <th>啟用/停用</th>
-            <th>操作</th>
-          </tr></thead>
+          <thead>
+            <tr style="background:#fafafa">
+              <th style="width:30px"><input type="checkbox"></th>
+              <th style="color:var(--txl);font-weight:400">大量編輯<br><span style="font-size:10px">已選擇 0 規格</span></th>
+              <th></th>
+              <th></th>
+              <th><input type="text" placeholder="折扣" style="width:60px;padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:11px"> 折</th>
+              <th><input type="text" placeholder="活動庫存" style="width:70px;padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:11px"></th>
+              <th></th>
+              <th><input type="text" placeholder="無限制" style="width:70px;padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:11px"></th>
+              <th><button style="background:var(--or);color:#fff;border:none;padding:4px 8px;border-radius:3px;font-size:11px;cursor:pointer">全部更新</button></th>
+              <th style="display:flex;gap:4px;padding-top:6px"><button style="border:1px solid var(--bdr);background:#fff;padding:3px 6px;border-radius:3px;font-size:10px;cursor:pointer">啟用</button><button style="border:1px solid var(--bdr);background:#fff;padding:3px 6px;border-radius:3px;font-size:10px;cursor:pointer">停用</button><button style="border:1px solid #e0e0e0;background:#fff;padding:3px 6px;border-radius:3px;font-size:10px;cursor:pointer;color:#f44">刪除</button></th>
+            </tr>
+            <tr>
+              <th style="width:30px"><input type="checkbox"></th>
+              <th>規格</th>
+              <th>原價</th>
+              <th>折扣後售價</th>
+              <th>折扣</th>
+              <th>活動庫存 ⓘ</th>
+              <th>庫存 ⓘ</th>
+              <th>購買限制 ⓘ</th>
+              <th>啟用/停用</th>
+              <th>操作</th>
+            </tr>
+          </thead>
           <tbody id="flashTbody"></tbody>
         </table>
       </div>
@@ -618,7 +633,7 @@ function renderFlash(){
   FLASH_GROUPS.forEach((g,gi)=>{
     // group header
     const gtr=document.createElement('tr');gtr.className='fs-group';
-    gtr.innerHTML=`<td><input type="checkbox"></td><td colspan="6"><div class="fs-group-hd"><div class="gi">${g.img}</div><span>${g.name}</span></div></td><td><span style="font-size:11px;color:var(--txl);border:1px solid var(--bdr);border-radius:3px;padding:2px 6px">${g.limit}</span></td><td class="fs-ops"><span>🗑</span><span>⊕</span><span>📋</span></td>`;
+    gtr.innerHTML=`<td><input type="checkbox"></td><td colspan="7"><div class="fs-group-hd"><div class="gi">${g.img}</div><span>${g.name}</span></div></td><td><span style="font-size:11px;color:var(--txl);border:1px solid var(--bdr);border-radius:3px;padding:2px 6px">${g.limit}</span></td><td class="fs-ops"><span>🗑</span><span>⊕</span><span>📋</span></td>`;
     tb.appendChild(gtr);
     g.items.forEach((it,ii)=>{
       const itr=document.createElement('tr');itr.className='fs-row';itr.dataset.gi=gi;itr.dataset.ii=ii;
@@ -628,6 +643,7 @@ function renderFlash(){
         <td>NT$ <span style="font-weight:500">${it.disc}</span></td>
         <td>或 ${it.discR} 折</td>
         <td><input type="number" class="fs-input" value="${it.stock}" data-orig-stock="${it.origStock}" min="0"></td>
+        <td style="color:var(--txl)">${it.origStock}</td>
         <td>${it.bought}</td>
         <td><label class="fs-toggle"><input type="checkbox" ${it.origStock>0?'checked':''}><span></span></label></td>
         <td class="fs-ops"><span>🗑</span><span>⊕</span><span>📋</span></td>`;
