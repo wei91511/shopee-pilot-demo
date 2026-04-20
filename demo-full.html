@@ -2,862 +2,818 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=1300">
-  <title>運營工具箱 Demo</title>
-  <link rel="stylesheet" href="demo.css">
+  <meta name="viewport" content="width=1400">
+  <title>蝦皮賣家中心</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sp-orange: #ee4d2d;
+      --sp-orange-light: #fff3f0;
+      --sp-orange-hover: #d44226;
+      --sp-blue: #1677ff;
+      --sp-green: #00b96b;
+      --sp-red: #f5222d;
+      --sp-gray: #f5f5f5;
+      --sp-border: #e8e8e8;
+      --sp-text: #333;
+      --sp-text-light: #888;
+      --sp-nav-bg: #333;
+      --sp-nav-w: 220px;
+      --sp-panel-w: 320px;
+      --sp-top-h: 52px;
+    }
+    body { font-family: -apple-system, 'Noto Sans TC', sans-serif; font-size: 13px; background: #f0f2f5; color: var(--sp-text); overflow-x: hidden; }
+
+    /* ─── Top Bar ─── */
+    .sp-top { position: fixed; top: 0; left: 0; right: 0; height: var(--sp-top-h); background: var(--sp-orange); display: flex; align-items: center; padding: 0 16px; z-index: 100; gap: 16px; }
+    .sp-top-logo { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
+    .sp-top-logo span { font-size: 11px; opacity: .7; font-weight: 400; margin-left: 6px; }
+    .sp-top-spacer { flex: 1; }
+    .sp-top-shop { color: rgba(255,255,255,.9); font-size: 13px; background: rgba(255,255,255,.15); border-radius: 4px; padding: 4px 10px; }
+    .sp-top-notif { color: #fff; font-size: 18px; cursor: pointer; opacity: .8; }
+
+    /* ─── Layout ─── */
+    .layout { display: flex; padding-top: var(--sp-top-h); min-height: 100vh; }
+
+    /* ─── Left Nav ─── */
+    .left-nav { width: var(--sp-nav-w); background: var(--sp-nav-bg); position: fixed; top: var(--sp-top-h); bottom: 0; left: 0; overflow-y: auto; z-index: 50; flex-shrink: 0; }
+    .nav-group-title { color: rgba(255,255,255,.45); font-size: 11px; padding: 16px 16px 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: rgba(255,255,255,.75); cursor: pointer; transition: background .15s; font-size: 13px; border-left: 3px solid transparent; }
+    .nav-item:hover { background: rgba(255,255,255,.08); }
+    .nav-item.active { color: #fff; background: rgba(238,77,45,.35); border-left-color: var(--sp-orange); }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-sub { padding-left: 50px; font-size: 12px; }
+    .nav-sub.active { color: #fff; background: rgba(238,77,45,.2); border-left-color: var(--sp-orange); }
+
+    /* ─── Main Content ─── */
+    .main-content { margin-left: var(--sp-nav-w); margin-right: var(--sp-panel-w); flex: 1; padding: 20px; min-width: 0; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #222; }
+
+    /* ─── Cards ─── */
+    .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .card-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: #333; }
+
+    /* ─── Date Bar ─── */
+    .date-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .date-btn { padding: 5px 12px; border: 1px solid var(--sp-border); border-radius: 4px; background: #fff; cursor: pointer; font-size: 12px; color: var(--sp-text-light); }
+    .date-btn.active { border-color: var(--sp-orange); color: var(--sp-orange); background: var(--sp-orange-light); }
+
+    /* ─── Tables ─── */
+    .s-table { width: 100%; border-collapse: collapse; }
+    .s-table th { background: #fafafa; border-bottom: 1px solid var(--sp-border); padding: 10px 12px; text-align: left; font-weight: 500; color: var(--sp-text-light); font-size: 12px; white-space: nowrap; }
+    .s-table td { padding: 12px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    .s-table tr:last-child td { border-bottom: none; }
+    .s-table tr.highlight td { background: #fffbe6; transition: background .3s; }
+    .s-table tr.updated td { background: #f6ffed; transition: background .6s; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+    .badge-green { background: #f6ffed; color: var(--sp-green); border: 1px solid #b7eb8f; }
+    .badge-red { background: #fff1f0; color: var(--sp-red); border: 1px solid #ffa39e; }
+    .badge-orange { background: var(--sp-orange-light); color: var(--sp-orange); border: 1px solid #ffbb96; }
+    .val-good { color: var(--sp-green); font-weight: 600; }
+    .val-warn { color: #fa8c16; font-weight: 600; }
+    .val-bad { color: var(--sp-red); font-weight: 600; }
+    .product-cell { display: flex; align-items: center; gap: 10px; }
+    .product-img { width: 40px; height: 40px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+
+    /* ─── Flash Sale ─── */
+    .fs-table input[type=number] { width: 70px; padding: 4px 6px; border: 1px solid var(--sp-border); border-radius: 4px; text-align: center; }
+    .fs-table input[type=number].filled { border-color: var(--sp-orange); background: var(--sp-orange-light); font-weight: 600; transition: all .3s; }
+
+    /* ─── Voucher Form ─── */
+    .voucher-form { display: grid; gap: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--sp-text-light); margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--sp-border); border-radius: 4px; font-size: 13px; }
+    .form-group input.filled { border-color: var(--sp-orange); background: var(--sp-orange-light); transition: all .3s; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ─── Chat Page ─── */
+    .chat-layout { display: flex; gap: 16px; height: calc(100vh - var(--sp-top-h) - 80px); }
+    .chat-list { width: 280px; background: #fff; border-radius: 8px; overflow-y: auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); flex-shrink: 0; }
+    .chat-list-header { padding: 14px 16px; border-bottom: 1px solid var(--sp-border); font-weight: 600; font-size: 14px; }
+    .chat-item { padding: 12px 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; gap: 10px; align-items: flex-start; transition: background .15s; }
+    .chat-item:hover { background: #fafafa; }
+    .chat-item.active { background: var(--sp-orange-light); }
+    .chat-item.unread .chat-item-name { font-weight: 700; }
+    .chat-item.unread .chat-item-msg { color: var(--sp-text); }
+    .chat-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--sp-gray); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .chat-item-meta { flex: 1; min-width: 0; }
+    .chat-item-name { font-size: 13px; font-weight: 500; }
+    .chat-item-msg { font-size: 12px; color: var(--sp-text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .chat-item-time { font-size: 11px; color: var(--sp-text-light); white-space: nowrap; }
+    .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sp-orange); margin-top: 4px; flex-shrink: 0; }
+    .chat-window { flex: 1; background: #fff; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .chat-win-header { padding: 14px 20px; border-bottom: 1px solid var(--sp-border); display: flex; align-items: center; gap: 12px; }
+    .chat-win-header .buyer-name { font-size: 15px; font-weight: 600; }
+    .chat-win-header .buyer-product { font-size: 12px; color: var(--sp-text-light); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 70%; }
+    .msg.buyer { align-self: flex-start; }
+    .msg.seller { align-self: flex-end; }
+    .msg-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .msg.buyer .msg-bubble { background: #f0f2f5; border-radius: 2px 12px 12px 12px; }
+    .msg.seller .msg-bubble { background: var(--sp-orange); color: #fff; border-radius: 12px 2px 12px 12px; }
+    .msg.ai .msg-bubble { background: #e6f7ff; border: 1px solid #91d5ff; color: #0050b3; border-radius: 2px 12px 12px 12px; }
+    .msg-label { font-size: 11px; color: var(--sp-text-light); margin-bottom: 4px; }
+    .msg.seller .msg-label { text-align: right; }
+    .ai-tag { display: inline-block; background: var(--sp-blue); color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+    .rule-tag { display: inline-block; background: #722ed1; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+    .typing-indicator { align-self: flex-start; background: #f0f2f5; padding: 10px 14px; border-radius: 2px 12px 12px 12px; display: none; }
+    .typing-dots { display: inline-flex; gap: 4px; }
+    .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #bbb; animation: bounce .9s infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+    .chat-input-bar { padding: 12px 16px; border-top: 1px solid var(--sp-border); display: flex; gap: 8px; align-items: center; }
+    .chat-input-bar input { flex: 1; padding: 8px 12px; border: 1px solid var(--sp-border); border-radius: 20px; font-size: 13px; outline: none; }
+    .chat-send-btn { background: var(--sp-orange); color: #fff; border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+    /* ─── Side Panel ─── */
+    .side-panel { width: var(--sp-panel-w); position: fixed; top: var(--sp-top-h); right: 0; bottom: 0; background: #fff; border-left: 1px solid var(--sp-border); display: flex; flex-direction: column; z-index: 50; overflow: hidden; }
+    .sp-header { background: var(--sp-orange); color: #fff; padding: 14px 16px; flex-shrink: 0; }
+    .sp-header-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .sp-title { font-size: 16px; font-weight: 700; }
+    .sp-plan { font-size: 11px; background: rgba(255,255,255,.2); border-radius: 10px; padding: 2px 8px; }
+    .sp-shop-info { font-size: 12px; opacity: .85; }
+    .sp-tab-bar { display: flex; background: #f5f5f5; border-bottom: 1px solid var(--sp-border); flex-shrink: 0; }
+    .sp-tab { flex: 1; padding: 10px 4px; border: none; background: none; cursor: pointer; font-size: 11px; color: var(--sp-text-light); display: flex; flex-direction: column; align-items: center; gap: 3px; border-bottom: 2px solid transparent; }
+    .sp-tab.active { color: var(--sp-orange); border-bottom-color: var(--sp-orange); background: #fff; }
+    .sp-tab-icon { font-size: 16px; }
+    .sp-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .sp-section { margin-bottom: 16px; }
+    .sp-section-title { font-size: 11px; font-weight: 600; color: var(--sp-text-light); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .sp-btn { display: block; width: 100%; padding: 9px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; margin-bottom: 8px; transition: all .15s; }
+    .sp-btn-primary { background: var(--sp-orange); color: #fff; }
+    .sp-btn-primary:hover { background: var(--sp-orange-hover); }
+    .sp-btn-secondary { background: #f5f5f5; color: var(--sp-text); border: 1px solid var(--sp-border); }
+    .sp-btn-secondary:hover { background: #e8e8e8; }
+    .sp-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .sp-rule-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    .sp-rule-row:last-child { border-bottom: none; }
+    .sp-rule-label { font-size: 12px; color: var(--sp-text-light); }
+    .sp-rule-val { font-size: 12px; font-weight: 600; }
+    .sp-log { font-size: 11px; color: var(--sp-text-light); background: #f9f9f9; border-radius: 4px; padding: 8px; line-height: 1.8; max-height: 140px; overflow-y: auto; }
+    .sp-log .log-line { padding: 1px 0; }
+    .sp-log .log-ok { color: var(--sp-green); }
+    .sp-log .log-run { color: var(--sp-blue); }
+    .sp-log .log-skip { color: var(--sp-text-light); }
+    .sp-toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 20px; transition: .3s; }
+    .toggle-slider::before { content:''; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+    .toggle input:checked + .toggle-slider { background: var(--sp-orange); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+    .sp-chat-rule { background: #f9f9f9; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+    .sp-chat-rule-kw { font-size: 12px; color: var(--sp-blue); font-weight: 600; margin-bottom: 4px; }
+    .sp-chat-rule-reply { font-size: 12px; color: var(--sp-text); }
+    .sp-persona-select { width: 100%; padding: 6px 8px; border: 1px solid var(--sp-border); border-radius: 4px; font-size: 12px; margin-bottom: 8px; }
+    .sp-trigger-btn { width: 100%; padding: 9px; border-radius: 6px; border: 1px dashed var(--sp-blue); background: #e6f7ff; color: var(--sp-blue); cursor: pointer; font-size: 12px; font-weight: 500; transition: all .15s; }
+    .sp-trigger-btn:hover { background: #bae7ff; }
+
+    /* ─── Scan animation ─── */
+    .scan-progress { height: 3px; background: #f0f0f0; border-radius: 2px; overflow: hidden; margin-bottom: 12px; display: none; }
+    .scan-progress-bar { height: 100%; width: 0; background: var(--sp-orange); transition: width .4s; border-radius: 2px; }
+    .scan-result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .scan-summary { font-size: 12px; color: var(--sp-text-light); display: none; }
+
+    /* ─── Voucher template list ─── */
+    .tpl-list { display: flex; flex-direction: column; gap: 6px; }
+    .tpl-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f9f9f9; border-radius: 6px; border: 1px solid var(--sp-border); cursor: pointer; transition: all .15s; }
+    .tpl-item:hover { border-color: var(--sp-orange); background: var(--sp-orange-light); }
+    .tpl-item.selected { border-color: var(--sp-orange); background: var(--sp-orange-light); }
+    .tpl-name { font-size: 12px; font-weight: 500; }
+    .tpl-apply-btn { font-size: 11px; color: var(--sp-orange); font-weight: 600; }
+
+    /* ─── Schedule ─── */
+    .schedule-row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+    .schedule-row label { color: var(--sp-text-light); min-width: 60px; }
+    .schedule-row select { padding: 4px 6px; border: 1px solid var(--sp-border); border-radius: 4px; font-size: 12px; }
+
+    /* ─── Status bar ─── */
+    .status-bar { font-size: 11px; color: var(--sp-text-light); background: #f9f9f9; padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sp-green); }
+    .status-dot.idle { background: #bbb; }
+  </style>
 </head>
 <body>
 
-  <!-- ===== Header ===== -->
-  <header class="page-header">
-    <div class="page-header-inner">
-      <div class="page-brand">
-        <span class="page-logo">🛒</span>
-        <div>
-          <h1>運營工具箱 <span class="badge-demo">互動 Demo</span></h1>
-          <p class="page-tagline">不用安裝，直接體驗完整功能</p>
-        </div>
-      </div>
-      <div class="page-controls">
-        <button id="autoPlayBtn" class="ctrl-btn ctrl-primary hidden">
-          <span id="autoPlayIcon">▶</span> <span id="autoPlayLabel">開始演示</span>
-        </button>
-        <button id="pauseBtn" class="ctrl-btn ctrl-secondary hidden">⏸ 暫停</button>
-        <button id="resetBtn" class="ctrl-btn ctrl-secondary">↺ 重置</button>
-        <a href="#cta-section" class="ctrl-btn ctrl-cta">立即試用 →</a>
-      </div>
+<!-- ═══════════════════════════════════ TOP BAR ═══════════════════════════════════ -->
+<div class="sp-top">
+  <div class="sp-top-logo">Shopee <span>賣家中心</span></div>
+  <div class="sp-top-spacer"></div>
+  <div class="sp-top-notif" title="通知">🔔</div>
+  <div class="sp-top-shop">🏪 展示商店</div>
+</div>
+
+<!-- ═══════════════════════════════════ LAYOUT ═══════════════════════════════════ -->
+<div class="layout">
+
+<!-- ─── Left Nav ─── -->
+<nav class="left-nav">
+  <div class="nav-group-title">管理</div>
+  <div class="nav-item" onclick="navTo('none')"><span class="nav-icon">📦</span>商品管理</div>
+  <div class="nav-item" onclick="navTo('none')"><span class="nav-icon">📋</span>訂單管理</div>
+  <div class="nav-group-title">行銷</div>
+  <div class="nav-item" id="nav-ad" onclick="navTo('ad')"><span class="nav-icon">📣</span>行銷中心</div>
+  <div class="nav-item nav-sub" id="nav-ad-sub" onclick="navTo('ad')">↳ 蝦皮廣告</div>
+  <div class="nav-item nav-sub" id="nav-flash-sub" onclick="navTo('flash')">↳ 限時特賣</div>
+  <div class="nav-item nav-sub" id="nav-voucher-sub" onclick="navTo('voucher')">↳ 優惠券</div>
+  <div class="nav-item" id="nav-chat" onclick="navTo('chat')"><span class="nav-icon">💬</span>聊聊管理</div>
+  <div class="nav-group-title">分析</div>
+  <div class="nav-item" onclick="navTo('none')"><span class="nav-icon">📊</span>數據中心</div>
+</nav>
+
+<!-- ─── Main Content ─── -->
+<div class="main-content">
+
+  <!-- ════ 廣告管理 ════ -->
+  <div class="page active" id="page-ad">
+    <div class="page-title">蝦皮廣告</div>
+    <div class="date-bar">
+      <button class="date-btn">今天</button>
+      <button class="date-btn">昨天</button>
+      <button class="date-btn active">最近 7 天 ▾</button>
+      <button class="date-btn">最近 30 天</button>
     </div>
-  </header>
-
-  <!-- ===== 步驟提示列 ===== -->
-  <div class="step-bar" id="stepBar">
-    <div class="step-bar-inner" id="stepText"></div>
-  </div>
-
-  <!-- ===== 功能 Tab 選擇 ===== -->
-  <div class="feature-tabs">
-    <div class="feature-tabs-inner">
-      <button class="ftab active" data-ftab="ad">📊 廣告管理</button>
-      <button class="ftab" data-ftab="flash">🏷️ 限時特賣</button>
-      <button class="ftab" data-ftab="voucher">🎫 優惠券</button>
-    </div>
-  </div>
-
-  <!-- ===== 主體 ===== -->
-  <main class="demo-wrap">
-
-    <!-- ==============================
-         廣告管理 Tab
-         ============================== -->
-    <div class="ftab-content active" id="ftab-ad">
-      <div class="demo-columns">
-
-        <!-- ── 左：Side Panel ── -->
-        <div class="sp-frame" id="spFrame">
-          <div class="sp-header">
-            <div class="sp-header-top">
-              <div class="sp-header-title-row">
-                <h2>🧰 蝦皮工具箱</h2>
-                <span class="sp-plan-badge sp-badge-trial">試用 7天</span>
-              </div>
-              <div class="sp-header-actions">
-                <button class="sp-icon-btn">⚙️</button>
-              </div>
-            </div>
-            <div class="sp-auth-row">
-              <div class="sp-auth-shop-line">
-                <span class="sp-shop-name-big">🏪 示範賣場</span>
-                <button class="sp-signout-btn">登出</button>
-              </div>
-              <span class="sp-user-name">示範帳號</span>
-            </div>
-          </div>
-
-          <div class="sp-tab-bar">
-            <button class="sp-tab active" data-sptab="ad">
-              <span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span>
-            </button>
-            <button class="sp-tab" data-sptab="flash">
-              <span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span>
-            </button>
-            <button class="sp-tab" data-sptab="coupon">
-              <span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span>
-            </button>
-            <button class="sp-tab" data-sptab="discount">
-              <span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span>
-            </button>
-          </div>
-
-          <div class="sp-body" id="spBody">
-
-            <!-- SP: 廣告管理 -->
-            <div class="sp-tab-content active" id="sptab-ad">
-
-              <!-- 賣場資訊 -->
-              <div class="sp-card">
-                <div class="sp-shop-row">
-                  <span class="sp-dot green"></span>
-                  <span class="sp-shop-name">商店名稱</span>
-                  <span class="sp-version">v4.2.6</span>
-                </div>
-              </div>
-
-              <!-- 調整規則 -->
-              <div class="sp-card" id="spRulesCard">
-                <div class="sp-section-header">
-                  <span>📋 調整規則</span>
-                  <button class="sp-edit-link">編輯</button>
-                </div>
-                <div class="sp-rules-list">
-                  <div class="sp-rule-item">
-                    <span class="sp-badge trigger">觸發</span>
-                    <span>餘額&lt;10元 → 以花費為基準調整</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge custom">#1</span>
-                    <span>點擊率 ≥ 3.85% → +5元</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge custom">#2</span>
-                    <span>投入產出比 ≥ 10 → +20元</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge roas">ROAS</span>
-                    <span>ROAS達標 → +15元</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge fallback">預設</span>
-                    <span>其他 → +4元</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge limit">上限</span>
-                    <span>單筆上限 200元</span>
-                  </div>
-                  <div class="sp-rule-item">
-                    <span class="sp-badge limit">上限</span>
-                    <span>總預算上限 2500元</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 掃描 & 執行 -->
-              <div class="sp-btn-row">
-                <button class="sp-action-btn sp-primary" id="scanBtn">🔍 掃描廣告</button>
-                <button class="sp-action-btn sp-success" id="executeBtn" disabled>✅ 執行調整</button>
-              </div>
-
-              <!-- 緊急停止 -->
-              <button class="sp-action-btn sp-danger sp-full hidden" id="stopBtn">🛑 緊急停止</button>
-
-              <!-- 進度條 -->
-              <div class="sp-progress hidden" id="spProgress">
-                <div class="sp-progress-label">
-                  <span id="spProgressLabel">處理中...</span>
-                  <span id="spProgressPct"></span>
-                </div>
-                <div class="sp-progress-track">
-                  <div class="sp-progress-fill" id="spProgressFill"></div>
-                </div>
-              </div>
-
-              <!-- 掃描結果 -->
-              <div class="sp-result-panel hidden" id="scanResultPanel"></div>
-              <!-- 執行結果 -->
-              <div class="sp-result-panel hidden" id="executeResultPanel"></div>
-
-              <!-- 操作記錄 -->
-              <div class="sp-card">
-                <div class="sp-section-header">
-                  <span>📝 操作記錄</span>
-                  <div>
-                    <button class="sp-icon-btn-sm">📥</button>
-                    <button class="sp-icon-btn-sm">🗑️</button>
-                  </div>
-                </div>
-                <div class="sp-log" id="spLog">
-                  <div class="sp-log-empty">尚無操作記錄</div>
-                </div>
-              </div>
-
-              <!-- 其他動作 -->
-              <button id="adResetBtn" class="sp-action-btn sp-outline sp-full" style="margin-bottom:6px;">🔄 重置預算</button>
-              <button class="sp-action-btn sp-secondary sp-full" style="margin-bottom:6px;">📊 分析健康度</button>
-              <button class="sp-action-btn sp-outline sp-full" style="margin-bottom:8px;">📤 測試推播</button>
-
-              <!-- 排程設定（移至底部） -->
-              <div class="sp-card" id="spScheduleCard">
-                <div class="sp-section-header">
-                  <span>⏰ 排程設定</span>
-                  <label class="sp-toggle">
-                    <input type="checkbox" id="scheduleToggle" checked>
-                    <span class="sp-toggle-slider"></span>
-                  </label>
-                </div>
-                <div class="sp-schedule-edit" id="spScheduleEdit">
-                  <div class="sp-row-col">
-                    <label class="sp-small-label">執行分鐘（可多選）</label>
-                    <div class="sp-minute-chips">
-                      <label class="sp-mchip"><input type="checkbox" value="0"  checked disabled><span>0分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="5"  disabled><span>5分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="10" disabled><span>10分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="15" disabled><span>15分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="20" disabled><span>20分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="25" disabled><span>25分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="30" checked disabled><span>30分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="35" disabled><span>35分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="40" disabled><span>40分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="45" disabled><span>45分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="50" disabled><span>50分</span></label>
-                      <label class="sp-mchip"><input type="checkbox" value="55" disabled><span>55分</span></label>
-                    </div>
-                  </div>
-                  <div class="sp-settings-row">
-                    <label class="sp-small-label">開始時間</label>
-                    <select id="spStartHour" class="sp-select-sm" disabled>
-                      <option value="8" selected>8</option>
-                    </select>
-                    <span class="sp-unit">時</span>
-                  </div>
-                  <div class="sp-settings-row">
-                    <label class="sp-small-label">結束時間</label>
-                    <select id="spEndHour" class="sp-select-sm" disabled>
-                      <option value="24" selected>24</option>
-                    </select>
-                    <span class="sp-unit">時</span>
-                  </div>
-                  <div class="sp-settings-row">
-                    <label class="sp-small-label">自動切換頁面</label>
-                    <label class="sp-toggle sp-toggle-sm">
-                      <input type="checkbox" disabled>
-                      <span class="sp-toggle-slider"></span>
-                    </label>
-                  </div>
-                  <div class="sp-detail-row">
-                    <span class="sp-detail-label">上次執行</span>
-                    <span class="sp-last-run" id="spLastRun">2026/3/23 下午5:35</span>
-                  </div>
-                  <button class="sp-action-btn sp-primary sp-full" id="spScheduleSave" disabled>
-                    💾 儲存排程設定
-                  </button>
-                </div>
-                <!-- 倒數計時（自動播放時顯示） -->
-                <div class="sp-countdown hidden" id="spCountdown">
-                  <span class="sp-countdown-label">下次執行</span>
-                  <span class="sp-countdown-time" id="spCountdownTime">--:--</span>
-                </div>
-              </div>
-
-            </div><!-- /sptab-ad -->
-
-            <!-- SP: 限時特賣 -->
-            <div class="sp-tab-content" id="sptab-flash">
-              <div class="sp-card">
-                <h3 class="sp-card-title">🏷️ 快速設定活動庫存</h3>
-                <div class="sp-mode-selector">
-                  <label class="sp-radio">
-                    <input type="radio" name="spStockMode" value="divide" checked>
-                    <span>庫存除以</span>
-                    <input type="number" value="2" min="1" max="10" class="sp-num-input">
-                    <span class="sp-unit">（無條件進位）</span>
-                  </label>
-                  <label class="sp-radio">
-                    <input type="radio" name="spStockMode" value="fixed">
-                    <span>統一數量</span>
-                    <input type="number" value="10" min="1" max="99" class="sp-num-input">
-                    <span class="sp-unit">個</span>
-                  </label>
-                </div>
-                <div class="sp-btn-row">
-                  <button class="sp-action-btn sp-secondary">🔍 預覽變更</button>
-                  <button class="sp-action-btn sp-primary" disabled>🚀 執行修改</button>
-                </div>
-                <label class="sp-checkbox"><input type="checkbox" checked><span>執行後自動全選</span></label>
-                <label class="sp-checkbox"><input type="checkbox"><span>一次性完成（自動啟用 + 確定）</span></label>
-              </div>
-              <div class="sp-card sp-info-card">
-                <h3 class="sp-card-title warn">⚠️ 防呆規則</h3>
-                <ul class="sp-info-list">
-                  <li>活動庫存範圍：1 ~ 99</li>
-                  <li>不得超過現有庫存數量</li>
-                  <li>庫存為 0 的規格自動跳過</li>
-                </ul>
-              </div>
-              <button class="sp-action-btn sp-outline sp-full">📱 測試推播</button>
-            </div>
-
-            <!-- SP: 優惠券 -->
-            <div class="sp-tab-content" id="sptab-coupon">
-              <div class="sp-card">
-                <h3 class="sp-card-title">📅 優惠券可使用時間</h3>
-                <div class="sp-date-row">
-                  <span class="sp-date-label">開始</span>
-                  <input class="sp-date-input" type="text" placeholder="yyyymmddhhmm" value="202604010000">
-                </div>
-                <div class="sp-date-row">
-                  <span class="sp-date-label">結束</span>
-                  <input class="sp-date-input" type="text" placeholder="yyyymmddhhmm" value="202604300000">
-                </div>
-              </div>
-              <div class="sp-card">
-                <label class="sp-checkbox" style="margin:0;">
-                  <input type="checkbox" checked>
-                  <span>自動生成優惠券代碼（5碼英數字）</span>
-                </label>
-              </div>
-              <button class="sp-action-btn sp-primary sp-full" style="margin-bottom:8px;">🚀 快速填入</button>
-              <div class="sp-card">
-                <h3 class="sp-card-title">📋 範本</h3>
-                <div class="sp-template-list">
-                  <div class="sp-template-item">
-                    <span class="sp-template-name">滿199折10</span>
-                    <div class="sp-template-btns">
-                      <button class="sp-t-btn sp-t-apply" title="套用">✓</button>
-                      <button class="sp-t-btn" title="置頂">📌</button>
-                      <button class="sp-t-btn" title="刪除">🗑</button>
-                    </div>
-                  </div>
-                  <div class="sp-template-item">
-                    <span class="sp-template-name">滿399折25</span>
-                    <div class="sp-template-btns">
-                      <button class="sp-t-btn sp-t-apply">✓</button>
-                      <button class="sp-t-btn">📌</button>
-                      <button class="sp-t-btn">🗑</button>
-                    </div>
-                  </div>
-                  <div class="sp-template-item">
-                    <span class="sp-template-name">滿599折50</span>
-                    <div class="sp-template-btns">
-                      <button class="sp-t-btn sp-t-apply">✓</button>
-                      <button class="sp-t-btn">📌</button>
-                      <button class="sp-t-btn">🗑</button>
-                    </div>
-                  </div>
-                  <div class="sp-template-item">
-                    <span class="sp-template-name">【週年慶】滿999折100</span>
-                    <div class="sp-template-btns">
-                      <button class="sp-t-btn sp-t-apply">✓</button>
-                      <button class="sp-t-btn">📌</button>
-                      <button class="sp-t-btn">🗑</button>
-                    </div>
-                  </div>
-                  <div class="sp-template-item">
-                    <span class="sp-template-name">【新客專屬】滿299折20</span>
-                    <div class="sp-template-btns">
-                      <button class="sp-t-btn sp-t-apply">✓</button>
-                      <button class="sp-t-btn">📌</button>
-                      <button class="sp-t-btn">🗑</button>
-                    </div>
-                  </div>
-                </div>
-                <button class="sp-add-template-btn">＋ 新增範本</button>
-              </div>
-            </div>
-
-            <!-- SP: 折扣活動 -->
-            <div class="sp-tab-content" id="sptab-discount">
-              <div class="sp-coming-soon">
-                <div class="sp-cs-icon">💰</div>
-                <h3>折扣活動管理</h3>
-                <p>批量管理折扣活動<br>即將推出，敬請期待</p>
-              </div>
-            </div>
-
-          </div><!-- /sp-body -->
-          <div class="sp-footer"><span class="sp-footer-disclaimer">本工具為輔助性質，操作前請確認設定無誤</span></div>
-        </div><!-- /sp-frame -->
-
-        <!-- ── 右：蝦皮後台 ── -->
-        <div class="shopee-frame" id="shopeeFrame">
-
-          <!-- 廣告管理後台 -->
-          <div class="s-page active" id="spage-ad">
-            <div class="shopee-topbar">
-              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
-              <span class="shopee-shop">商店名稱</span>
-            </div>
-            <div class="shopee-body">
-              <nav class="shopee-nav">
-                <div class="snav-item">📦 商品管理</div>
-                <div class="snav-item">📋 訂單管理</div>
-                <div class="snav-item active">📣 行銷中心</div>
-                <div class="snav-sub active">↳ 蝦皮廣告</div>
-                <div class="snav-item">🏷️ 限時特賣</div>
-                <div class="snav-item">🎫 優惠券</div>
-                <div class="snav-item">📊 數據中心</div>
-              </nav>
-              <div class="shopee-content">
-                <div class="shopee-page-title">蝦皮廣告</div>
-                <div class="shopee-date-bar">
-                  <span class="s-date-btn">今天</span>
-                  <span class="s-date-btn">昨天</span>
-                  <span class="s-date-btn s-date-active">最近7天 ▾</span>
-                  <span class="s-date-btn">最近30天</span>
-                </div>
-                <table class="s-table">
-                  <thead>
-                    <tr>
-                      <th><input type="checkbox" checked></th>
-                      <th>商品</th>
-                      <th>狀態</th>
-                      <th>日預算</th>
-                      <th>花費</th>
-                      <th>ROAS</th>
-                      <th>點擊率</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adTableBody">
-                    <tr data-id="A">
-                      <td><input type="checkbox" class="ad-cb" checked></td>
-                      <td>
-                        <div class="s-product">
-                          <div class="s-product-img">🎧</div>
-                          <span class="s-ad-name">藍芽耳機旗艦款</span>
-                        </div>
-                      </td>
-                      <td><span class="s-badge green">投放中</span></td>
-                      <td class="s-budget" data-orig="170">$170</td>
-                      <td>$162</td>
-                      <td class="s-good">6.2</td>
-                      <td class="s-good">4.1%</td>
-                    </tr>
-                    <tr data-id="B">
-                      <td><input type="checkbox" class="ad-cb" checked></td>
-                      <td>
-                        <div class="s-product">
-                          <div class="s-product-img">📱</div>
-                          <span class="s-ad-name">手機殼多色款</span>
-                        </div>
-                      </td>
-                      <td><span class="s-badge green">投放中</span></td>
-                      <td class="s-budget" data-orig="85">$85</td>
-                      <td>$80</td>
-                      <td class="s-ok">4.8</td>
-                      <td class="s-good">3.5%</td>
-                    </tr>
-                    <tr data-id="C">
-                      <td><input type="checkbox" class="ad-cb" checked></td>
-                      <td>
-                        <div class="s-product">
-                          <div class="s-product-img">🔌</div>
-                          <span class="s-ad-name">快充線三件組</span>
-                        </div>
-                      </td>
-                      <td><span class="s-badge green">投放中</span></td>
-                      <td class="s-budget" data-orig="85">$85</td>
-                      <td>$77</td>
-                      <td class="s-ok">5.1</td>
-                      <td class="s-warn">1.8%</td>
-                    </tr>
-                    <tr data-id="D">
-                      <td><input type="checkbox" class="ad-cb" checked></td>
-                      <td>
-                        <div class="s-product">
-                          <div class="s-product-img">🛡️</div>
-                          <span class="s-ad-name">螢幕保護貼</span>
-                        </div>
-                      </td>
-                      <td><span class="s-badge green">投放中</span></td>
-                      <td class="s-budget" data-orig="90">$90</td>
-                      <td>$88</td>
-                      <td class="s-good">5.5</td>
-                      <td class="s-good">3.2%</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- 限時特賣後台 -->
-          <div class="s-page" id="spage-flash">
-            <div class="shopee-topbar">
-              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
-              <span class="shopee-shop">商店名稱</span>
-            </div>
-            <div class="shopee-body">
-              <nav class="shopee-nav">
-                <div class="snav-item">📦 商品管理</div>
-                <div class="snav-item">📣 行銷中心</div>
-                <div class="snav-item active">🏷️ 限時特賣</div>
-                <div class="snav-sub active">↳ 設定商品</div>
-              </nav>
-              <div class="shopee-content">
-                <div class="shopee-page-title">設定商品</div>
-                <table class="s-table">
-                  <thead>
-                    <tr>
-                      <th><input type="checkbox" checked></th>
-                      <th>商品名稱/規格</th>
-                      <th>原售價</th>
-                      <th>折扣後售價</th>
-                      <th>折扣</th>
-                      <th>活動庫存</th>
-                      <th>購買限制</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type="checkbox" checked></td>
-                      <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 黑色</span></div></td>
-                      <td>$599</td>
-                      <td class="s-ok">$509</td>
-                      <td>85折</td>
-                      <td class="s-flash-stock" id="flash-stock-1">5</td>
-                      <td>1件</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" checked></td>
-                      <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 白色</span></div></td>
-                      <td>$599</td>
-                      <td class="s-ok">$509</td>
-                      <td>85折</td>
-                      <td class="s-flash-stock" id="flash-stock-2">3</td>
-                      <td>1件</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" checked></td>
-                      <td><div class="s-product"><div class="s-product-img">📱</div><span>手機殼 / iPhone 15</span></div></td>
-                      <td>$299</td>
-                      <td class="s-ok">$249</td>
-                      <td>83折</td>
-                      <td class="s-flash-stock" id="flash-stock-3">10</td>
-                      <td>2件</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- 優惠券後台 -->
-          <div class="s-page" id="spage-coupon">
-            <div class="shopee-topbar">
-              <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
-              <span class="shopee-shop">商店名稱</span>
-            </div>
-            <div class="shopee-body">
-              <nav class="shopee-nav">
-                <div class="snav-item">📣 行銷中心</div>
-                <div class="snav-item active">🎫 優惠券</div>
-                <div class="snav-sub active">↳ 建立優惠券</div>
-              </nav>
-              <div class="shopee-content">
-                <div class="shopee-page-title">建立優惠券</div>
-                <div class="s-form">
-                  <div class="s-form-section">
-                    <div class="s-form-title">基本資訊</div>
-                    <div class="s-form-row">
-                      <label>優惠券名稱</label>
-                      <div class="s-form-input" id="svoucherName">常駐299-5</div>
-                    </div>
-                    <div class="s-form-row">
-                      <label>優惠代碼</label>
-                      <div class="s-form-input mono" id="svoucherCode">A7K2P</div>
-                    </div>
-                    <div class="s-form-row">
-                      <label>使用期間</label>
-                      <div class="s-form-input" id="svoucherPeriod">
-                        <span id="sVStart">2026/04/01 00:00</span> 至 <span id="sVEnd">2026/04/30 00:00</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="s-form-section">
-                    <div class="s-form-title">折扣設定</div>
-                    <div class="s-form-row">
-                      <label>折扣類型</label>
-                      <div class="s-form-input">折扣</div>
-                    </div>
-                    <div class="s-form-row">
-                      <label>折扣金額</label>
-                      <div class="s-form-input">NT$5</div>
-                    </div>
-                    <div class="s-form-row">
-                      <label>最低消費</label>
-                      <div class="s-form-input">NT$299</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /shopee-frame -->
-      </div><!-- /demo-columns -->
-
-      <!-- TG 通知 -->
-      <div class="tg-wrap" id="tgWrap">
-        <div class="tg-card">
-          <div class="tg-card-header">
-            <span>📱 Telegram 推播模擬</span>
-            <span class="tg-hint">排程執行完成後自動推播</span>
-          </div>
-          <div class="tg-chat" id="tgChat">
-            <div class="tg-empty">排程自動執行後，通知將顯示於此 📬</div>
-          </div>
-        </div>
+    <div class="card">
+      <div class="scan-progress" id="scanProgress"><div class="scan-progress-bar" id="scanBar"></div></div>
+      <div class="scan-result-header">
+        <div class="card-title" style="margin:0">廣告活動列表</div>
+        <div class="scan-summary" id="scanSummary"></div>
       </div>
-
-    </div><!-- /ftab-ad -->
-
-    <!-- ==============================
-         限時特賣 Tab
-         ============================== -->
-    <div class="ftab-content" id="ftab-flash">
-      <!-- 每個 Tab 獨立播放按鈕 -->
-      <div class="tab-controls">
-        <button class="btn-play-tab" id="playFlashSaleBtn">▶ 播放演示</button>
-        <button class="btn-reset-tab" id="resetFlashSaleBtn">↺ 重置</button>
-      </div>
-      <div class="demo-columns">
-        <div class="sp-frame sp-frame-fixed">
-          <div class="sp-header">
-            <div class="sp-header-top">
-              <div class="sp-header-title-row">
-                <h2>🧰 蝦皮工具箱</h2>
-                <span class="sp-plan-badge sp-badge-trial">試用 7天</span>
-              </div>
-              <div class="sp-header-actions"><button class="sp-icon-btn">⚙️</button></div>
-            </div>
-            <div class="sp-auth-row">
-              <div class="sp-auth-shop-line">
-                <span class="sp-shop-name-big">🏪 示範賣場</span>
-                <button class="sp-signout-btn">登出</button>
-              </div>
-              <span class="sp-user-name">示範帳號</span>
-            </div>
-          </div>
-          <div class="sp-tab-bar">
-            <button class="sp-tab" data-sptab2="ad"><span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span></button>
-            <button class="sp-tab active" data-sptab2="flash"><span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span></button>
-            <button class="sp-tab" data-sptab2="coupon"><span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span></button>
-            <button class="sp-tab" data-sptab2="discount"><span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span></button>
-          </div>
-          <div class="sp-body">
-            <!-- 主要設定卡 -->
-            <div class="sp-card" id="flashModeCard">
-              <h3 class="sp-card-title">🏷️ 快速設定活動庫存</h3>
-              <div class="sp-mode-selector">
-                <label class="sp-radio" id="flashModeLabel1">
-                  <input type="radio" name="fMode2" checked>
-                  <span>庫存除以</span>
-                  <input type="number" value="2" class="sp-num-input">
-                  <span class="sp-unit">（無條件進位）</span>
-                </label>
-                <label class="sp-radio">
-                  <input type="radio" name="fMode2">
-                  <span>統一數量</span>
-                  <input type="number" value="10" class="sp-num-input">
-                  <span class="sp-unit">個</span>
-                </label>
-              </div>
-              <div class="sp-btn-row">
-                <button class="sp-action-btn sp-secondary" id="flashPreviewBtn">🔍 預覽變更</button>
-                <button class="sp-action-btn sp-primary" id="flashExecuteBtn" disabled>🚀 執行修改</button>
-              </div>
-              <!-- 進度條 -->
-              <div class="sp-progress hidden" id="flashProgress">
-                <div class="sp-progress-label">
-                  <span id="flashProgressLabel">處理中...</span>
-                </div>
-                <div class="sp-progress-track">
-                  <div class="sp-progress-fill" id="flashProgressFill"></div>
-                </div>
-              </div>
-              <!-- 結果面板 -->
-              <div class="sp-result-panel hidden" id="flashResultPanel"></div>
-              <label class="sp-checkbox"><input type="checkbox" checked><span>執行後自動全選</span></label>
-              <label class="sp-checkbox"><input type="checkbox"><span>一次性完成（自動啟用 + 確定）</span></label>
-            </div>
-            <div class="sp-card sp-info-card">
-              <h3 class="sp-card-title warn">⚠️ 防呆規則</h3>
-              <ul class="sp-info-list">
-                <li>活動庫存範圍：1 ~ 99</li>
-                <li>不得超過現有庫存數量</li>
-                <li>庫存為 0 的規格自動跳過</li>
-              </ul>
-            </div>
-            <button class="sp-action-btn sp-outline sp-full">📱 測試推播</button>
-          </div>
-        </div>
-        <!-- 蝦皮後台（含互動 ID） -->
-        <div class="shopee-frame">
-          <div class="shopee-topbar">
-            <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
-            <span class="shopee-shop">商店名稱</span>
-          </div>
-          <div class="shopee-body">
-            <nav class="shopee-nav">
-              <div class="snav-item active">🏷️ 限時特賣</div>
-              <div class="snav-sub active">↳ 設定商品</div>
-            </nav>
-            <div class="shopee-content">
-              <div class="shopee-page-title">設定商品</div>
-              <table class="s-table">
-                <thead>
-                  <tr>
-                    <th><input type="checkbox" checked></th>
-                    <th>商品名稱/規格</th>
-                    <th>原售價</th>
-                    <th>折扣後售價</th>
-                    <th>折扣</th>
-                    <th>活動庫存</th>
-                    <th>購買限制</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr id="f2-row-1">
-                    <td><input type="checkbox" checked></td>
-                    <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 黑色</span></div></td>
-                    <td>$599</td><td class="s-ok">$509</td><td>85折</td>
-                    <td class="s-flash-stock" id="f2-stock-1" data-orig="14">14</td>
-                    <td>1件</td>
-                  </tr>
-                  <tr id="f2-row-2">
-                    <td><input type="checkbox" checked></td>
-                    <td><div class="s-product"><div class="s-product-img">🎧</div><span>藍芽耳機 / 白色</span></div></td>
-                    <td>$599</td><td class="s-ok">$509</td><td>85折</td>
-                    <td class="s-flash-stock" id="f2-stock-2" data-orig="20">20</td>
-                    <td>1件</td>
-                  </tr>
-                  <tr id="f2-row-3">
-                    <td><input type="checkbox" checked></td>
-                    <td><div class="s-product"><div class="s-product-img">📱</div><span>手機殼 / iPhone 15</span></div></td>
-                    <td>$299</td><td class="s-ok">$249</td><td>83折</td>
-                    <td class="s-flash-stock" id="f2-stock-3" data-orig="8">8</td>
-                    <td>2件</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /ftab-flash -->
-
-    <!-- ==============================
-         優惠券 Tab
-         ============================== -->
-    <div class="ftab-content" id="ftab-voucher">
-      <!-- 每個 Tab 獨立播放按鈕 -->
-      <div class="tab-controls">
-        <button class="btn-play-tab" id="playVoucherBtn">▶ 播放演示</button>
-        <button class="btn-reset-tab" id="resetVoucherBtn">↺ 重置</button>
-      </div>
-      <div class="demo-columns">
-        <div class="sp-frame sp-frame-fixed">
-          <div class="sp-header">
-            <div class="sp-header-top">
-              <div class="sp-header-title-row">
-                <h2>🧰 蝦皮工具箱</h2>
-                <span class="sp-plan-badge sp-badge-trial">試用 7天</span>
-              </div>
-              <div class="sp-header-actions"><button class="sp-icon-btn">⚙️</button></div>
-            </div>
-            <div class="sp-auth-row">
-              <div class="sp-auth-shop-line">
-                <span class="sp-shop-name-big">🏪 示範賣場</span>
-                <button class="sp-signout-btn">登出</button>
-              </div>
-              <span class="sp-user-name">示範帳號</span>
-            </div>
-          </div>
-          <div class="sp-tab-bar">
-            <button class="sp-tab" data-sptab3="ad"><span class="sp-tab-icon">📊</span><span class="sp-tab-label">廣告管理</span></button>
-            <button class="sp-tab" data-sptab3="flash"><span class="sp-tab-icon">🏷️</span><span class="sp-tab-label">限時特賣</span></button>
-            <button class="sp-tab active" data-sptab3="coupon"><span class="sp-tab-icon">🎫</span><span class="sp-tab-label">優惠券</span></button>
-            <button class="sp-tab" data-sptab3="discount"><span class="sp-tab-icon">💰</span><span class="sp-tab-label">折扣活動</span></button>
-          </div>
-          <div class="sp-body">
-            <div class="sp-card">
-              <h3 class="sp-card-title">📅 優惠券可使用時間</h3>
-              <div class="sp-date-row">
-                <span class="sp-date-label">開始</span>
-                <input class="sp-date-input" id="vStartDate" type="text" value="202604010000">
-              </div>
-              <div class="sp-date-row">
-                <span class="sp-date-label">結束</span>
-                <input class="sp-date-input" id="vEndDate" type="text" value="202604300000">
-              </div>
-            </div>
-            <div class="sp-card">
-              <label class="sp-checkbox" style="margin:0;"><input type="checkbox" checked><span>自動生成優惠券代碼（5碼英數字）</span></label>
-              <div class="sp-code-preview" id="vCodeDisplay">--</div>
-            </div>
-            <button class="sp-action-btn sp-primary sp-full" id="vFillBtn" style="margin-bottom:8px;">🚀 快速填入</button>
-            <div class="sp-card">
-              <h3 class="sp-card-title">📋 範本</h3>
-              <div class="sp-template-list" id="vTplList">
-                <div class="sp-template-item"><span class="sp-template-name">滿199折10</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
-                <div class="sp-template-item"><span class="sp-template-name">滿399折25</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
-                <div class="sp-template-item"><span class="sp-template-name">滿599折50</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
-                <div class="sp-template-item"><span class="sp-template-name">【週年慶】滿999折100</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
-                <div class="sp-template-item"><span class="sp-template-name">【新客專屬】滿299折20</span><div class="sp-template-btns"><button class="sp-t-btn sp-t-apply">✓</button><button class="sp-t-btn">📌</button><button class="sp-t-btn">🗑</button></div></div>
-              </div>
-              <button class="sp-add-template-btn">＋ 新增範本</button>
-            </div>
-          </div>
-        </div>
-        <!-- 蝦皮後台（含互動 ID，初始空白） -->
-        <div class="shopee-frame">
-          <div class="shopee-topbar">
-            <span class="shopee-logo">🛍️ Shopee 賣家中心</span>
-            <span class="shopee-shop">商店名稱</span>
-          </div>
-          <div class="shopee-body">
-            <nav class="shopee-nav">
-              <div class="snav-item active">🎫 優惠券</div>
-              <div class="snav-sub active">↳ 建立優惠券</div>
-            </nav>
-            <div class="shopee-content">
-              <div class="shopee-page-title">建立優惠券</div>
-              <div class="s-form">
-                <div class="s-form-section">
-                  <div class="s-form-title">基本資訊</div>
-                  <div class="s-form-row"><label>優惠券名稱</label><div class="s-form-input" id="v2-name">—</div></div>
-                  <div class="s-form-row"><label>優惠代碼</label><div class="s-form-input mono" id="v2-code">—</div></div>
-                  <div class="s-form-row"><label>使用期間</label><div class="s-form-input" id="v2-period">—</div></div>
-                </div>
-                <div class="s-form-section">
-                  <div class="s-form-title">折扣設定</div>
-                  <div class="s-form-row"><label>折扣類型</label><div class="s-form-input">折扣</div></div>
-                  <div class="s-form-row"><label>折扣金額</label><div class="s-form-input" id="v2-discount">—</div></div>
-                  <div class="s-form-row"><label>最低消費</label><div class="s-form-input" id="v2-minimum">—</div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /ftab-voucher -->
-
-  </main>
-
-  <!-- ===== CTA 區塊 ===== -->
-  <section class="cta-section" id="cta-section">
-    <div class="cta-inner">
-      <h2 class="cta-title">即將上線</h2>
-      <p class="cta-sub">敬請期待</p>
-    </div>
-  </section>
-
-  <!-- ===== 免責聲明 ===== -->
-  <div class="demo-disclaimer">
-    <p>免責聲明：運營工具箱為輔助工具，所有操作結果由使用者自行負責。使用前請詳閱<a href="guide.html" class="demo-disclaimer-link">使用須知</a>。</p>
-  </div>
-
-  <footer class="page-footer">
-    <p>運營工具箱 © 2026 ｜ 本頁面為功能展示用途 ｜ <a href="guide.html" class="footer-guide-link">📖 使用手冊</a></p>
-  </footer>
-
-  <!-- ===== 橫向提示 Overlay ===== -->
-  <div id="orientOverlay" class="orient-overlay">
-    <div class="orient-box">
-      <div class="orient-icon">📱</div>
-      <p class="orient-msg">建議將手機<strong>橫向</strong>觀看<br>體驗更佳</p>
-      <button class="orient-btn" id="orientDismiss">知道了，繼續直向</button>
+      <table class="s-table" id="adTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" checked></th>
+            <th>廣告名稱</th>
+            <th>狀態</th>
+            <th>日預算</th>
+            <th>花費</th>
+            <th>ROAS</th>
+            <th>點擊率</th>
+          </tr>
+        </thead>
+        <tbody id="adTableBody">
+          <tr>
+            <td colspan="7" style="text-align:center;color:#bbb;padding:40px">
+              點擊右側「掃描廣告」開始
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <script src="demo.js"></script>
+  <!-- ════ 限時特賣 ════ -->
+  <div class="page" id="page-flash">
+    <div class="page-title">限時特賣 — 設定商品</div>
+    <div class="card">
+      <table class="s-table fs-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" checked></th>
+            <th>商品名稱 / 規格</th>
+            <th>原售價</th>
+            <th>折扣後售價</th>
+            <th>活動庫存</th>
+            <th>已購</th>
+          </tr>
+        </thead>
+        <tbody id="flashTableBody">
+          <tr data-fid="1">
+            <td><input type="checkbox" checked></td>
+            <td><div class="product-cell"><div class="product-img">🎧</div><div><div style="font-weight:500">藍芽耳機旗艦款</div><div style="font-size:11px;color:#888">顏色：黑色</div></div></div></td>
+            <td>$1,290</td><td>$990</td>
+            <td><input type="number" class="fs-qty" placeholder="—" min="1"></td>
+            <td>0</td>
+          </tr>
+          <tr data-fid="2">
+            <td><input type="checkbox" checked></td>
+            <td><div class="product-cell"><div class="product-img">🎧</div><div><div style="font-weight:500">藍芽耳機旗艦款</div><div style="font-size:11px;color:#888">顏色：白色</div></div></div></td>
+            <td>$1,290</td><td>$990</td>
+            <td><input type="number" class="fs-qty" placeholder="—" min="1"></td>
+            <td>0</td>
+          </tr>
+          <tr data-fid="3">
+            <td><input type="checkbox" checked></td>
+            <td><div class="product-cell"><div class="product-img">📱</div><div><div style="font-weight:500">手機殼多色款</div><div style="font-size:11px;color:#888">型號：iPhone 15</div></div></div></td>
+            <td>$299</td><td>$199</td>
+            <td><input type="number" class="fs-qty" placeholder="—" min="1"></td>
+            <td>2</td>
+          </tr>
+          <tr data-fid="4">
+            <td><input type="checkbox" checked></td>
+            <td><div class="product-cell"><div class="product-img">🔌</div><div><div style="font-weight:500">快充線三件組</div><div style="font-size:11px;color:#888">顏色：黑</div></div></div></td>
+            <td>$399</td><td>$299</td>
+            <td><input type="number" class="fs-qty" placeholder="—" min="1"></td>
+            <td>5</td>
+          </tr>
+          <tr data-fid="5">
+            <td><input type="checkbox" checked></td>
+            <td><div class="product-cell"><div class="product-img">🛡️</div><div><div style="font-weight:500">螢幕保護貼</div><div style="font-size:11px;color:#888">尺寸：6.7吋</div></div></div></td>
+            <td>$149</td><td>$99</td>
+            <td><input type="number" class="fs-qty" placeholder="—" min="1"></td>
+            <td>12</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════ 優惠券 ════ -->
+  <div class="page" id="page-voucher">
+    <div class="page-title">建立優惠券</div>
+    <div style="display:grid;grid-template-columns:1fr 400px;gap:16px">
+      <div class="card">
+        <div class="card-title">優惠券設定</div>
+        <div class="voucher-form">
+          <div class="form-group">
+            <label>優惠券名稱</label>
+            <input type="text" id="vName" placeholder="請輸入優惠券名稱">
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>開始日期</label><input type="text" id="vStart" placeholder="例：2026/04/25 00:00"></div>
+            <div class="form-group"><label>結束日期</label><input type="text" id="vEnd" placeholder="例：2026/04/30 23:59"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>折扣金額（元）</label><input type="number" id="vDiscount" placeholder="例：25"></div>
+            <div class="form-group"><label>最低消費（元）</label><input type="number" id="vMinOrder" placeholder="例：399"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>優惠券代碼</label><input type="text" id="vCode" placeholder="自動產生"></div>
+            <div class="form-group"><label>發放數量</label><input type="number" id="vQty" placeholder="例：100"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">📋 範本庫</div>
+          <div class="tpl-list" id="voucherTplList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 聊聊 ════ -->
+  <div class="page" id="page-chat">
+    <div class="page-title">聊聊管理</div>
+    <div class="chat-layout">
+      <div class="chat-list">
+        <div class="chat-list-header">對話列表</div>
+        <div class="chat-item active unread" onclick="selectChat(this,'A')">
+          <div class="chat-avatar">👤</div>
+          <div class="chat-item-meta">
+            <div class="chat-item-name">買家 C36***71</div>
+            <div class="chat-item-msg">請問有現貨嗎？</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="chat-item-time">剛剛</div>
+            <div class="unread-dot"></div>
+          </div>
+        </div>
+        <div class="chat-item" onclick="selectChat(this,'B')">
+          <div class="chat-avatar">👤</div>
+          <div class="chat-item-meta">
+            <div class="chat-item-name">買家 W82***44</div>
+            <div class="chat-item-msg">運費怎麼算？</div>
+          </div>
+          <div class="chat-item-time">10分前</div>
+        </div>
+        <div class="chat-item" onclick="selectChat(this,'C')">
+          <div class="chat-avatar">👤</div>
+          <div class="chat-item-meta">
+            <div class="chat-item-name">買家 L19***58</div>
+            <div class="chat-item-msg">這個可以客製化嗎？</div>
+          </div>
+          <div class="chat-item-time">25分前</div>
+        </div>
+        <div class="chat-item" onclick="selectChat(this,'D')">
+          <div class="chat-avatar">👤</div>
+          <div class="chat-item-meta">
+            <div class="chat-item-name">買家 M05***93</div>
+            <div class="chat-item-msg">收到了謝謝！</div>
+          </div>
+          <div class="chat-item-time">1小時前</div>
+        </div>
+      </div>
+      <div class="chat-window">
+        <div class="chat-win-header">
+          <div class="chat-avatar" style="width:40px;height:40px;font-size:20px">👤</div>
+          <div>
+            <div class="buyer-name" id="chatBuyerName">買家 C36***71</div>
+            <div class="buyer-product" id="chatBuyerProduct">藍芽耳機旗艦款</div>
+          </div>
+          <div style="flex:1"></div>
+          <span style="font-size:11px;color:#52c41a;background:#f6ffed;border:1px solid #b7eb8f;border-radius:3px;padding:2px 8px">🤖 AI 回覆中</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg buyer">
+            <div class="msg-label">買家 C36***71 · 13:42</div>
+            <div class="msg-bubble">你好，請問藍芽耳機旗艦款還有現貨嗎？黑色的</div>
+          </div>
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+        <div class="chat-input-bar">
+          <input type="text" placeholder="輸入訊息…" id="chatInput">
+          <button class="chat-send-btn" onclick="sendManualMsg()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- ═══════════════════════════════════ SIDE PANEL ═══════════════════════════════════ -->
+<div class="side-panel">
+  <div class="sp-header">
+    <div class="sp-header-row1">
+      <div class="sp-title">🧰 運營工具箱</div>
+      <div class="sp-plan">Pro 版</div>
+    </div>
+    <div class="sp-shop-info">🏪 展示商店 &nbsp;·&nbsp; v4.3.1</div>
+  </div>
+  <div class="sp-tab-bar">
+    <button class="sp-tab active" data-sp="ad" onclick="switchSPTab('ad')"><span class="sp-tab-icon">📊</span>廣告</button>
+    <button class="sp-tab" data-sp="flash" onclick="switchSPTab('flash')"><span class="sp-tab-icon">🏷️</span>特賣</button>
+    <button class="sp-tab" data-sp="voucher" onclick="switchSPTab('voucher')"><span class="sp-tab-icon">🎫</span>優惠券</button>
+    <button class="sp-tab" data-sp="chat" onclick="switchSPTab('chat')"><span class="sp-tab-icon">💬</span>聊聊</button>
+  </div>
+  <div class="sp-body">
+
+    <!-- SP: 廣告 -->
+    <div class="sp-panel-content" id="sp-ad">
+      <div class="sp-section">
+        <div class="status-bar" id="adStatusBar">
+          <div class="status-dot idle" id="adStatusDot"></div>
+          <span id="adStatusText">尚未掃描</span>
+        </div>
+        <button class="sp-btn sp-btn-primary" id="btnScan" onclick="doScan()">🔍 掃描廣告</button>
+        <button class="sp-btn sp-btn-secondary" id="btnExec" onclick="doExecute()" disabled>⚡ 執行調整</button>
+      </div>
+      <div class="sp-section">
+        <div class="sp-section-title">調整規則</div>
+        <div class="sp-rule-row"><span class="sp-rule-label">觸發條件</span><span class="sp-rule-val">花費 &lt; 預算 10%</span></div>
+        <div class="sp-rule-row"><span class="sp-rule-label">ROAS ≥ 5</span><span class="sp-rule-val">+15%</span></div>
+        <div class="sp-rule-row"><span class="sp-rule-label">點擊率 ≥ 3%</span><span class="sp-rule-val">+5%</span></div>
+        <div class="sp-rule-row"><span class="sp-rule-label">其他保底</span><span class="sp-rule-val">+4%</span></div>
+      </div>
+      <div class="sp-section">
+        <div class="sp-section-title">操作記錄</div>
+        <div class="sp-log" id="adLog"><div class="log-line log-skip">— 等待操作 —</div></div>
+      </div>
+      <div class="sp-section">
+        <div class="sp-section-title">排程設定</div>
+        <div class="schedule-row"><label>執行時段</label><select><option>08:00 – 22:00</option></select></div>
+        <div class="schedule-row"><label>執行分鐘</label><select><option>每 30 分</option></select></div>
+        <div class="sp-toggle-row">
+          <span style="font-size:12px">啟用排程</span>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SP: 限時特賣 -->
+    <div class="sp-panel-content" id="sp-flash" style="display:none">
+      <div class="sp-section">
+        <div class="status-bar">
+          <div class="status-dot" style="background:var(--sp-orange)"></div>
+          <span>已選 5 件商品</span>
+        </div>
+        <div class="sp-section-title">庫存設定模式</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="fsMode" value="div" checked> 除以</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="fsMode" value="fix"> 固定數量</label>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-size:12px;color:#888">數量</span>
+          <input type="number" id="fsDivider" value="3" style="width:60px;padding:5px 8px;border:1px solid var(--sp-border);border-radius:4px;font-size:12px">
+        </div>
+        <button class="sp-btn sp-btn-primary" onclick="doFlashFill()">🚀 快速填入</button>
+        <button class="sp-btn sp-btn-secondary" onclick="doFlashReset()">↺ 清除</button>
+      </div>
+    </div>
+
+    <!-- SP: 優惠券 -->
+    <div class="sp-panel-content" id="sp-voucher" style="display:none">
+      <div class="sp-section">
+        <div class="sp-section-title">日期設定</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDate" value="today" checked> 今天起</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDate" value="tomorrow"> 明天起</label>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDur" value="3"> 3天</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDur" value="7" checked> 7天</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDur" value="14"> 14天</label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="vDur" value="30"> 30天</label>
+        </div>
+        <button class="sp-btn sp-btn-primary" onclick="doVoucherFill()">🚀 快速填入</button>
+      </div>
+    </div>
+
+    <!-- SP: 聊聊 -->
+    <div class="sp-panel-content" id="sp-chat" style="display:none">
+      <div class="sp-section">
+        <div class="sp-toggle-row">
+          <span style="font-size:12px;font-weight:600">AI 自動回覆</span>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="status-bar" style="margin-bottom:12px">
+          <div class="status-dot"></div>
+          <span>輪詢中 · 每 30 分鐘</span>
+        </div>
+        <button class="sp-trigger-btn" onclick="triggerBuyerMsg()">💬 模擬買家訊息</button>
+      </div>
+      <div class="sp-section">
+        <div class="sp-section-title">關鍵字規則</div>
+        <div class="sp-chat-rule">
+          <div class="sp-chat-rule-kw">現貨 / 有貨</div>
+          <div class="sp-chat-rule-reply">「本商品現貨充足，下單後 1-2 個工作天出貨！」</div>
+        </div>
+        <div class="sp-chat-rule">
+          <div class="sp-chat-rule-kw">運費 / 怎麼算</div>
+          <div class="sp-chat-rule-reply">「超商取貨 60 元，購滿 599 免運！」</div>
+        </div>
+        <div class="sp-chat-rule">
+          <div class="sp-chat-rule-kw">保固 / 保障</div>
+          <div class="sp-chat-rule-reply">「提供一年保固，有問題直接私訊我們！」</div>
+        </div>
+      </div>
+      <div class="sp-section">
+        <div class="sp-section-title">AI 人格</div>
+        <select class="sp-persona-select">
+          <option>😊 親切型（推薦）</option>
+          <option>💼 專業型</option>
+          <option>🌸 可愛型</option>
+        </select>
+        <div style="font-size:11px;color:#888">知識庫：已設定商品介紹 × 3</div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /side-panel -->
+
+</div><!-- /layout -->
+
+<script>
+const AD_DATA = [
+  { id:'A', name:'藍芽耳機旗艦款', emoji:'🎧', budget:170, spend:162, roas:6.2, ctr:4.1 },
+  { id:'B', name:'手機殼多色款',   emoji:'📱', budget:85,  spend:80,  roas:4.8, ctr:3.5 },
+  { id:'C', name:'快充線三件組',   emoji:'🔌', budget:85,  spend:77,  roas:5.1, ctr:1.8 },
+  { id:'D', name:'螢幕保護貼',     emoji:'🛡️', budget:90,  spend:88,  roas:5.5, ctr:3.2 },
+];
+const VOUCHER_TEMPLATES = [
+  { name:'滿199折10', discount:10, min:199 },
+  { name:'滿399折25', discount:25, min:399 },
+  { name:'滿599折50', discount:50, min:599 },
+  { name:'週年慶 滿999折100', discount:100, min:999 },
+  { name:'新客專屬 滿299折20', discount:20, min:299 },
+];
+const CHAT_CONVOS = {
+  A: { buyer:'買家 C36***71', product:'藍芽耳機旗艦款',
+       msgs:[{ type:'buyer', text:'你好，請問藍芽耳機旗艦款還有現貨嗎？黑色的', time:'13:42' }],
+       trigger:'請問現貨還有嗎？', matchRule:'現貨', ruleReply:'本商品現貨充足，下單後 1-2 個工作天出貨！😊' },
+  B: { buyer:'買家 W82***44', product:'快充線三件組',
+       msgs:[{ type:'buyer', text:'你好，請問運費怎麼算？', time:'13:35' },
+             { type:'seller-ai', text:'超商取貨 60 元，購滿 599 免運！有任何問題歡迎詢問～', time:'13:35', tag:'rule', tagLabel:'規則：運費' }],
+       trigger:'那運費有沒有上限？', matchRule:'運費', ruleReply:'購滿 599 元即享免運優惠，超商取貨則為 60 元！' },
+  C: { buyer:'買家 L19***58', product:'手機殼多色款',
+       msgs:[{ type:'buyer', text:'這個手機殼可以客製化嗎？', time:'13:17' }],
+       trigger:'有沒有其他顏色可以選？', matchRule:null, aiReply:'您好！手機殼目前提供多款顏色，建議您到商品頁面查看詳細規格，有任何問題歡迎隨時詢問 😊' },
+  D: { buyer:'買家 M05***93', product:'螢幕保護貼',
+       msgs:[{ type:'buyer', text:'已收到商品，謝謝賣家！包裝很好', time:'12:48' },
+             { type:'seller-ai', text:'感謝您的支持！很高興商品讓您滿意，有任何問題歡迎再來詢問 😊', time:'12:49', tag:'ai', tagLabel:'Claude AI' }],
+       trigger:'想再問一下保固期多久？', matchRule:'保固', ruleReply:'提供一年保固，有問題直接私訊我們！' },
+};
+
+let currentConvo = 'A';
+let adScanned = false;
+let adAdjustments = [];
+
+function navTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (page === 'none') return;
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  const navMap = { ad:['nav-ad','nav-ad-sub'], flash:['nav-flash-sub'], voucher:['nav-voucher-sub'], chat:['nav-chat'] };
+  if (navMap[page]) navMap[page].forEach(id => { const el=document.getElementById(id); if(el) el.classList.add('active'); });
+  switchSPTab(page === 'none' ? 'ad' : page);
+}
+
+function switchSPTab(tab) {
+  document.querySelectorAll('.sp-tab').forEach(t => t.classList.toggle('active', t.dataset.sp === tab));
+  document.querySelectorAll('.sp-panel-content').forEach(p => p.style.display = 'none');
+  const el = document.getElementById('sp-' + tab);
+  if (el) el.style.display = 'block';
+}
+
+function tick(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function doScan() {
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true; btn.textContent = '掃描中…';
+  setAdStatus('掃描中…', false);
+  const prog = document.getElementById('scanProgress');
+  const bar = document.getElementById('scanBar');
+  prog.style.display = 'block'; bar.style.width = '0';
+  addLog('run','🔍 開始掃描廣告清單…');
+  await tick(400); bar.style.width = '40%';
+  await tick(500); bar.style.width = '75%';
+  addLog('run','  讀取廣告數據…');
+  await tick(500); bar.style.width = '100%';
+  await tick(300);
+  prog.style.display = 'none';
+  const tbody = document.getElementById('adTableBody');
+  tbody.innerHTML = '';
+  adAdjustments = [];
+  for (const ad of AD_DATA) {
+    const roasClass = ad.roas >= 5 ? 'val-good' : ad.roas >= 3 ? 'val-warn' : 'val-bad';
+    const ctrClass  = ad.ctr >= 3  ? 'val-good' : ad.ctr >= 1.5 ? 'val-warn' : 'val-bad';
+    let inc = 0, reason = '';
+    if (ad.roas >= 5)      { inc = Math.round(ad.budget * 0.15); reason = 'ROAS 達標 (+15%)'; }
+    else if (ad.ctr >= 3)  { inc = Math.round(ad.budget * 0.05); reason = '點擊率達標 (+5%)'; }
+    else                   { inc = Math.round(ad.budget * 0.04); reason = '保底 (+4%)'; }
+    adAdjustments.push({ ...ad, inc, newBudget: ad.budget + inc, reason });
+    const tr = document.createElement('tr');
+    tr.id = 'ad-row-' + ad.id;
+    tr.innerHTML = `<td><input type="checkbox" checked></td>
+      <td><div class="product-cell"><div class="product-img">${ad.emoji}</div><span>${ad.name}</span></div></td>
+      <td><span class="badge badge-green">投放中</span></td>
+      <td class="ad-budget" data-orig="${ad.budget}">$${ad.budget}</td>
+      <td>$${ad.spend}</td>
+      <td class="${roasClass}">${ad.roas}</td>
+      <td class="${ctrClass}">${ad.ctr}%</td>`;
+    tbody.appendChild(tr);
+    addLog('ok', `  ✓ ${ad.name} — ROAS ${ad.roas}`);
+    await tick(100);
+  }
+  document.getElementById('scanSummary').style.display = 'block';
+  document.getElementById('scanSummary').textContent = `共 ${AD_DATA.length} 個廣告，找到 ${adAdjustments.length} 筆可調整`;
+  adScanned = true;
+  setAdStatus(`已掃描 ${AD_DATA.length} 筆廣告`, true);
+  btn.disabled = false; btn.textContent = '🔍 掃描廣告';
+  document.getElementById('btnExec').disabled = false;
+  addLog('ok','✅ 掃描完成，可執行調整');
+}
+
+async function doExecute() {
+  if (!adScanned) return;
+  const btn = document.getElementById('btnExec');
+  btn.disabled = true; btn.textContent = '執行中…';
+  setAdStatus('執行調整中…', false);
+  addLog('run','⚡ 開始執行預算調整…');
+  for (const adj of adAdjustments) {
+    const row = document.getElementById('ad-row-' + adj.id);
+    if (!row) continue;
+    row.classList.add('highlight');
+    addLog('run', `  → ${adj.name}：$${adj.budget} ＋$${adj.inc}`);
+    await tick(700);
+    row.querySelector('.ad-budget').textContent = `$${adj.newBudget}`;
+    row.classList.remove('highlight');
+    row.classList.add('updated');
+    addLog('ok', `  ✓ ${adj.name}：已調整至 $${adj.newBudget}（${adj.reason}）`);
+    await tick(100);
+  }
+  setAdStatus(`執行完成 · 已調整 ${adAdjustments.length} 筆`, true);
+  btn.disabled = false; btn.textContent = '⚡ 執行調整';
+  addLog('ok','✅ 全部執行完畢');
+  setTimeout(() => { adScanned = false; document.getElementById('btnExec').disabled = true; }, 3000);
+}
+
+function setAdStatus(text, active) {
+  document.getElementById('adStatusText').textContent = text;
+  document.getElementById('adStatusDot').className = 'status-dot' + (active ? '' : ' idle');
+}
+
+function addLog(type, text) {
+  const log = document.getElementById('adLog');
+  const line = document.createElement('div');
+  line.className = 'log-line log-' + type;
+  line.textContent = text;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+  while (log.children.length > 20) log.removeChild(log.firstChild);
+}
+
+async function doFlashFill() {
+  const mode = document.querySelector('input[name="fsMode"]:checked')?.value || 'div';
+  const divider = parseInt(document.getElementById('fsDivider').value) || 3;
+  const ORIG_STOCK = [50, 50, 30, 80, 200];
+  const inputs = document.querySelectorAll('.fs-qty');
+  let idx = 0;
+  for (const inp of inputs) {
+    const orig = ORIG_STOCK[idx++] || 50;
+    inp.value = mode === 'div' ? Math.max(1, Math.floor(orig / divider)) : divider;
+    inp.classList.add('filled');
+    await tick(150);
+  }
+}
+
+function doFlashReset() {
+  document.querySelectorAll('.fs-qty').forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
+}
+
+function initVoucherTemplates() {
+  const list = document.getElementById('voucherTplList');
+  list.innerHTML = '';
+  VOUCHER_TEMPLATES.forEach(tpl => {
+    const div = document.createElement('div');
+    div.className = 'tpl-item';
+    div.innerHTML = `<span class="tpl-name">${tpl.name}</span><span class="tpl-apply-btn">套用 ›</span>`;
+    div.onclick = () => {
+      document.querySelectorAll('.tpl-item').forEach(t => t.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('vName').value = tpl.name;
+      document.getElementById('vDiscount').value = tpl.discount;
+      document.getElementById('vMinOrder').value = tpl.min;
+    };
+    list.appendChild(div);
+  });
+}
+
+function doVoucherFill() {
+  const startOffset = document.querySelector('input[name="vDate"]:checked')?.value === 'tomorrow' ? 1 : 0;
+  const dur = parseInt(document.querySelector('input[name="vDur"]:checked')?.value || '7');
+  const now = new Date(); now.setDate(now.getDate() + startOffset);
+  const end = new Date(now); end.setDate(end.getDate() + dur);
+  const fmt = d => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} 00:00`;
+  const fmtE = d => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} 23:59`;
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = ''; for (let i=0;i<5;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  if (!document.getElementById('vName').value) document.getElementById('vName').value = '折扣優惠';
+  if (!document.getElementById('vQty').value) document.getElementById('vQty').value = '100';
+  [['vStart',fmt(now)],['vEnd',fmtE(end)],['vCode',code]].forEach(([id,val]) => {
+    const el = document.getElementById(id);
+    el.value = val; el.classList.add('filled');
+    setTimeout(() => el.classList.remove('filled'), 2000);
+  });
+}
+
+function selectChat(el, id) {
+  document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  el.querySelector('.unread-dot')?.remove();
+  el.classList.remove('unread');
+  currentConvo = id;
+  const convo = CHAT_CONVOS[id];
+  if (!convo) return;
+  document.getElementById('chatBuyerName').textContent = convo.buyer;
+  document.getElementById('chatBuyerProduct').textContent = convo.product;
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = '';
+  convo.msgs.forEach(m => appendMsg(m.type, m.text, m.time, m.tag, m.tagLabel));
+}
+
+function appendMsg(type, text, time, tag, tagLabel) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (type === 'buyer' ? 'buyer' : type === 'seller-ai' ? 'ai' : 'seller');
+  const t = time || new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const tagHtml = tag ? `<span class="${tag==='ai'?'ai-tag':'rule-tag'}">${tagLabel}</span>` : '';
+  const lbl = type==='buyer' ? 'buyer' : type==='seller-ai' ? '🤖 AI' : '我';
+  div.innerHTML = `<div class="msg-label">${lbl} · ${t}</div><div class="msg-bubble">${tagHtml}${text}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function triggerBuyerMsg() {
+  const convo = CHAT_CONVOS[currentConvo];
+  if (!convo) return;
+  const t = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  appendMsg('buyer', convo.trigger, t);
+  const typingEl = document.getElementById('typingIndicator');
+  typingEl.style.display = 'block';
+  document.getElementById('chatMessages').scrollTop = 9999;
+  await tick(2200);
+  typingEl.style.display = 'none';
+  if (convo.matchRule) {
+    appendMsg('seller-ai', convo.ruleReply, t, 'rule', `規則：${convo.matchRule}`);
+  } else {
+    appendMsg('seller-ai', convo.aiReply || '您好！感謝您的詢問，我們會盡快協助您 😊', t, 'ai', 'Claude AI');
+  }
+}
+
+function sendManualMsg() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim(); if (!text) return;
+  inp.value = '';
+  appendMsg('seller', text);
+}
+
+document.getElementById('chatInput')?.addEventListener('keydown', e => { if (e.key==='Enter') sendManualMsg(); });
+document.querySelectorAll('.date-btn').forEach(btn => {
+  btn.addEventListener('click', () => { document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); });
+});
+
+// Init
+document.getElementById('nav-ad').classList.add('active');
+document.getElementById('nav-ad-sub').classList.add('active');
+initVoucherTemplates();
+</script>
 </body>
 </html>
